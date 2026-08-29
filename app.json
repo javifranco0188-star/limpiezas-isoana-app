@@ -4,6 +4,7 @@
     "slug": "limpiezas-isoana-2127",
     "version": "1.0.0",
     "orientation": "portrait",
+    "scheme": "limpiezasisoana",
     "icon": "./assets/limpiezas-isoana.png",
     "splash": {
       "image": "./assets/limpiezas-isoana.png",
