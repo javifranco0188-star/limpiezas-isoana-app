@@ -388,7 +388,29 @@ export default function App() {
               <Text style={s.bookingLine}>{b.service_address}</Text>
               <Text style={[s.bookingLine,{fontWeight:"800"}]}>Estado: {statusLabel(b.status)}</Text>
               <Text style={s.bookingLine}>Pago: {b.payment_status}</Text>
+{b.payment_status !== "paid" ? (
+  <TouchableOpacity
+    style={[s.primary,{marginTop:12}]}
+    onPress={async () => {
+      const {error} = await supabase
+        .from("bookings")
+        .update({payment_status:"paid"})
+        .eq("id",b.id);
 
+      if (error) {
+        Alert.alert("Error",error.message);
+      } else {
+        Alert.alert("Pago actualizado","La reserva está marcada como pagada.");
+        loadAdmin();
+        loadBookings();
+      }
+    }}
+  >
+    <Text style={s.primaryText}>MARCAR COMO PAGADO</Text>
+  </TouchableOpacity>
+) : (
+  <Text style={[s.label,{marginTop:12}]}>✅ PAGO REALIZADO</Text>
+)}
               <Text style={[s.label,{marginTop:12}]}>Asignar trabajador</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 <TouchableOpacity style={s.staffChip} onPress={()=>assignStaff(b.id,null)}>
