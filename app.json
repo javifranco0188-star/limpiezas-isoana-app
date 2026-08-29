@@ -18,6 +18,11 @@
         "backgroundColor": "#0B2E59"
       }
     },
-    "userInterfaceStyle": "light"
+    "userInterfaceStyle": "light",
+    "extra": {
+      "eas": {
+        "projectId": "a26ad206-8d89-4002-b52f-5ea5d7583ad8"
+      }
+    }
   }
 }
