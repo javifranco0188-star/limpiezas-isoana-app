@@ -40,7 +40,8 @@ export default function App() {
   const [staffList, setStaffList] = useState<any[]>([]);
   const [adminServices, setAdminServices] = useState<any[]>([]);
   const [adminPlans, setAdminPlans] = useState<any[]>([]);
-
+const [servicePriceDrafts, setServicePriceDrafts] = useState<Record<string,string>>({});
+const [planPriceDrafts, setPlanPriceDrafts] = useState<Record<string,string>>({});
 
   useEffect(() => {
     supabase.auth.getSession().then(({data}) => {
@@ -166,19 +167,45 @@ export default function App() {
     else loadAdminData();
   }
 
-  async function updateServicePrice(id:string, current:any) {
-    const next = current === null || current === undefined ? 45 : Number(current) + 5;
-    const {error} = await supabase.from("services").update({base_price: next}).eq("id", id);
-    if (error) Alert.alert("No se pudo actualizar", error.message);
-    else loadAdminData();
+  async function updateServicePrice(id:string, value:string) {
+  const price = Number(value.replace(",", "."));
+
+  if (isNaN(price) || price < 0) {
+    return Alert.alert("Precio no válido", "Introduce un precio correcto.");
   }
 
-  async function updatePlanPrice(id:string, current:any) {
-    const next = current === null || current === undefined ? 39 : Number(current) + 5;
-    const {error} = await supabase.from("maintenance_plans").update({price_per_visit: next}).eq("id", id);
-    if (error) Alert.alert("No se pudo actualizar", error.message);
-    else loadAdminData();
+  const {error} = await supabase
+    .from("services")
+    .update({base_price: price})
+    .eq("id", id);
+
+  if (error) {
+    Alert.alert("No se pudo actualizar", error.message);
+  } else {
+    Alert.alert("Precio actualizado", `Nuevo precio: ${price} €`);
+    loadAdminData();
   }
+}
+
+async function updatePlanPrice(id:string, value:string) {
+  const price = Number(value.replace(",", "."));
+
+  if (isNaN(price) || price < 0) {
+    return Alert.alert("Precio no válido", "Introduce un precio correcto.");
+  }
+
+  const {error} = await supabase
+    .from("maintenance_plans")
+    .update({price_per_visit: price})
+    .eq("id", id);
+
+  if (error) {
+    Alert.alert("No se pudo actualizar", error.message);
+  } else {
+    Alert.alert("Precio actualizado", `Nuevo precio: ${price} € por visita`);
+    loadAdminData();
+  }
+}
 
   async function loadCatalog() {
     const [{data:s},{data:p}] = await Promise.all([
@@ -449,26 +476,78 @@ export default function App() {
             </View>)}
 
             <Text style={s.subsection}>Precios de servicios</Text>
-            {adminServices.map(x=><View key={x.id} style={s.adminRow}>
-              <View style={{flex:1}}>
-                <Text style={s.adminTitle}>{x.name}</Text>
-                <Text style={s.adminMuted}>{x.base_price==null?"Sin precio":`${x.base_price} €`}</Text>
-              </View>
-              <TouchableOpacity style={s.smallButton} onPress={()=>updateServicePrice(x.id,x.base_price)}>
-                <Text style={s.smallButtonText}>+5 €</Text>
-              </TouchableOpacity>
-            </View>)}
 
-            <Text style={s.subsection}>Planes de mantenimiento</Text>
-            {adminPlans.map(x=><View key={x.id} style={s.adminRow}>
-              <View style={{flex:1}}>
-                <Text style={s.adminTitle}>{x.name}</Text>
-                <Text style={s.adminMuted}>{x.price_per_visit==null?"Sin precio":`${x.price_per_visit} € / visita`}</Text>
-              </View>
-              <TouchableOpacity style={s.smallButton} onPress={()=>updatePlanPrice(x.id,x.price_per_visit)}>
-                <Text style={s.smallButtonText}>+5 €</Text>
-              </TouchableOpacity>
-            </View>)}
+{adminServices.map(x => (
+  <View key={x.id} style={s.adminRow}>
+    <View style={{flex:1}}>
+      <Text style={s.adminTitle}>{x.name}</Text>
+      <Text style={s.adminMuted}>
+        {x.base_price == null ? "Sin precio" : `${x.base_price} €`}
+      </Text>
+
+      <TextInput
+        style={s.input}
+        keyboardType="decimal-pad"
+        placeholder="Nuevo precio €"
+        value={servicePriceDrafts[x.id] ?? ""}
+        onChangeText={(value) =>
+          setServicePriceDrafts(prev => ({...prev, [x.id]: value}))
+        }
+      />
+
+      <TouchableOpacity
+        style={s.smallButton}
+        onPress={() => {
+          const value = servicePriceDrafts[x.id];
+          if (!value) {
+            Alert.alert("Falta el precio", "Escribe el nuevo precio.");
+            return;
+          }
+          updateServicePrice(x.id, value);
+        }}
+      >
+        <Text style={s.smallButtonText}>GUARDAR PRECIO</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+))}
+
+<Text style={s.subsection}>Planes de mantenimiento</Text>
+
+{adminPlans.map(x => (
+  <View key={x.id} style={s.adminRow}>
+    <View style={{flex:1}}>
+      <Text style={s.adminTitle}>{x.name}</Text>
+      <Text style={s.adminMuted}>
+        {x.price_per_visit == null ? "Sin precio" : `${x.price_per_visit} € / visita`}
+      </Text>
+
+      <TextInput
+        style={s.input}
+        keyboardType="decimal-pad"
+        placeholder="Nuevo precio por visita €"
+        value={planPriceDrafts[x.id] ?? ""}
+        onChangeText={(value) =>
+          setPlanPriceDrafts(prev => ({...prev, [x.id]: value}))
+        }
+      />
+
+      <TouchableOpacity
+        style={s.smallButton}
+        onPress={() => {
+          const value = planPriceDrafts[x.id];
+          if (!value) {
+            Alert.alert("Falta el precio", "Escribe el nuevo precio.");
+            return;
+          }
+          updatePlanPrice(x.id, value);
+        }}
+      >
+        <Text style={s.smallButtonText}>GUARDAR PRECIO</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+))}
 
             <Text style={s.subsection}>Equipo</Text>
             {staffList.map(st=><View key={st.id} style={s.adminRow}>
