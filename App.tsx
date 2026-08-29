@@ -42,7 +42,7 @@ export default function App() {
   const [adminPlans, setAdminPlans] = useState<any[]>([]);
 const [servicePriceDrafts, setServicePriceDrafts] = useState<Record<string,string>>({});
 const [planPriceDrafts, setPlanPriceDrafts] = useState<Record<string,string>>({});
-
+const [clientList, setClientList] = useState<any[]>([]);  
   useEffect(() => {
     supabase.auth.getSession().then(({data}) => {
       setSession(data.session);
@@ -126,32 +126,62 @@ const [planPriceDrafts, setPlanPriceDrafts] = useState<Record<string,string>>({}
 
   async function loadAdminData() {
     if (!session?.user?.id || role !== "admin") return;
-    const [b, st, sv, pl] = await Promise.all([
-      supabase
-        .from("bookings")
-        .select("id,status,scheduled_at,service_address,customer_name,customer_phone,payment_status,reservation_amount,total_amount,assigned_staff_id,services(name),maintenance_plans(name)")
-        .order("created_at",{ascending:false})
-        .limit(100),
-      supabase
-        .from("profiles")
-        .select("id,full_name,phone,role")
-        .in("role",["staff","admin"])
-        .order("full_name"),
-      supabase
-        .from("services")
-        .select("id,name,base_price,active")
-        .order("name"),
-      supabase
-        .from("maintenance_plans")
-        .select("id,name,price_per_visit,active")
-        .order("name")
-    ]);
-    if (!b.error) setAdminBookings(b.data || []);
-    if (!st.error) setStaffList(st.data || []);
-    if (!sv.error) setAdminServices(sv.data || []);
-    if (!pl.error) setAdminPlans(pl.data || []);
+    const [b, st, sv, pl, cl] = await Promise.all([
+  supabase
+    .from("bookings")
+    .select("id,status,scheduled_at,service_address,customer_name,customer_phone,payment_status,assigned_staff_id,services(name)")
+    .order("created_at",{ascending:false})
+    .limit(100),
+
+  supabase
+    .from("profiles")
+    .select("id,full_name,phone,role")
+    .in("role",["staff","admin"])
+    .order("full_name"),
+
+  supabase
+    .from("services")
+    .select("id,name,base_price,active")
+    .order("name"),
+
+  supabase
+    .from("maintenance_plans")
+    .select("id,name,price_per_visit,active")
+    .order("name"),
+
+  supabase
+    .from("profiles")
+    .select("id,full_name,phone,role")
+    .eq("role","client")
+    .order("full_name")
+]);
+
+if (!b.error) setAdminBookings(b.data || []);
+if (!st.error) setStaffList(st.data || []);
+if (!sv.error) setAdminServices(sv.data || []);
+if (!pl.error) setAdminPlans(pl.data || []);
+if (!cl.error) setClientList(cl.data || []);
+  }
+async function changeUserRole(profileId:string, newRole:"client"|"staff") {
+  const {error} = await supabase
+    .from("profiles")
+    .update({role:newRole})
+    .eq("id", profileId);
+
+  if (error) {
+    Alert.alert("No se pudo cambiar el usuario", error.message);
+    return;
   }
 
+  Alert.alert(
+    "Actualizado",
+    newRole === "staff"
+      ? "Usuario añadido al personal."
+      : "Usuario retirado del personal."
+  );
+
+  loadAdminData();
+}
   async function assignStaff(bookingId:string, staffId:string|null) {
     const {error} = await supabase
       .from("bookings")
@@ -550,12 +580,56 @@ async function updatePlanPrice(id:string, value:string) {
 ))}
 
             <Text style={s.subsection}>Equipo</Text>
-            {staffList.map(st=><View key={st.id} style={s.adminRow}>
-              <View>
-                <Text style={s.adminTitle}>{st.full_name || "Sin nombre"}</Text>
-                <Text style={s.adminMuted}>{st.role} · {st.phone || "sin teléfono"}</Text>
-              </View>
-            </View>)}
+
+{staffList
+  .filter(st => st.role === "staff")
+  .map(st => (
+    <View key={st.id} style={s.adminRow}>
+      <View style={{flex:1}}>
+        <Text style={s.adminTitle}>
+          {st.full_name || "Sin nombre"}
+        </Text>
+        <Text style={s.adminMuted}>
+          {st.phone || "Sin teléfono"}
+        </Text>
+      </View>
+
+      <TouchableOpacity
+        style={s.smallButton}
+        onPress={() => changeUserRole(st.id, "client")}
+      >
+        <Text style={s.smallButtonText}>QUITAR</Text>
+      </TouchableOpacity>
+    </View>
+  ))}
+
+<Text style={s.subsection}>Añadir personal</Text>
+
+{clientList.length === 0 ? (
+  <View style={s.infoBox}>
+    <Text>No hay clientes disponibles para añadir.</Text>
+  </View>
+) : (
+  clientList.map(cl => (
+    <View key={cl.id} style={s.adminRow}>
+      <View style={{flex:1}}>
+        <Text style={s.adminTitle}>
+          {cl.full_name || "Sin nombre"}
+        </Text>
+        <Text style={s.adminMuted}>
+          {cl.phone || "Sin teléfono"}
+        </Text>
+      </View>
+
+      <TouchableOpacity
+        style={s.smallButton}
+        onPress={() => changeUserRole(cl.id, "staff")}
+      >
+        <Text style={s.smallButtonText}>AÑADIR</Text>
+      </TouchableOpacity>
+    </View>
+  ))
+)}
           </>}
         </>}
 
