@@ -198,9 +198,16 @@ export default function App() {
       else setTab("inicio");
     } else {
       const {error} = await supabase.auth.signUp({
-        email,password,
-        options:{ data:{ full_name: authName, phone: authPhone } }
-      });
+  email,
+  password,
+  options: {
+    data: {
+      full_name: authName,
+      phone: authPhone
+    },
+    emailRedirectTo: "limpiezasisoana://auth/callback"
+  }
+});
       if (error) Alert.alert("No se pudo crear la cuenta", error.message);
       else Alert.alert("Cuenta creada","Si Supabase solicita confirmar el correo, revisa tu bandeja de entrada.");
     }
