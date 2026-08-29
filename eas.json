@@ -4,15 +4,17 @@
   },
   "build": {
     "preview": {
-      "distribution": "internal",
-      "android": {
-        "buildType": "apk"
-      }
-    },
+  "node": "22.14.0",
+  "distribution": "internal",
+  "android": {
+    "buildType": "apk"
+  }
+    }
     "production": {
-      "android": {
-        "buildType": "app-bundle"
-      }
+  "node": "22.14.0",
+  "android": {
+    "buildType": "app-bundle"
+  }
     }
   }
 }
