@@ -336,7 +336,28 @@ export default function App() {
             <Text style={s.bookingLine}>{new Date(b.scheduled_at).toLocaleString()}</Text>
             <Text style={s.bookingLine}>{b.service_address}</Text>
             <Text style={s.bookingLine}>Pago: {b.payment_status}</Text>
-            <TouchableOpacity style={s.secondary} onPress={()=>openMaps(b.service_address)}><Text style={s.secondaryText}>VER EN GPS</Text></TouchableOpacity>
+
+{b.payment_status === "pending" && (
+  <TouchableOpacity
+    style={s.primary}
+    onPress={() =>
+      Linking.openURL(
+        `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(
+          `Hola, quiero realizar el pago de mi reserva de Limpiezas Isoana.\nServicio: ${b.services?.name || "Limpieza"}\nFecha: ${new Date(b.scheduled_at).toLocaleString()}`
+        )}`
+      )
+    }
+  >
+    <Text style={s.primaryText}>PAGAR / CONTACTAR POR WHATSAPP</Text>
+  </TouchableOpacity>
+)}
+
+<TouchableOpacity
+  style={s.secondary}
+  onPress={() => openMaps(b.service_address)}
+>
+  <Text style={s.secondaryText}>VER EN GPS</Text>
+</TouchableOpacity>
           </View>)}
         </>}
 
