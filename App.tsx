@@ -8,9 +8,8 @@ import { StatusBar } from "expo-status-bar";
 import { supabase } from "./src/supabase";
 
 type Tab = "inicio" | "reservar" | "reserva" | "planes" | "contacto" | "cuenta" | "personal" | "admin";
-type Service = { id:string; name:string; description?:string|null };
-type Plan = { id:string; name:string; description?:string|null };
-
+type Service = { id:string; name:string; description?:string|null; base_price?:number|null };
+type Plan = { id:string; name:string; description?:string|null; base_price?:number|null };
 const PHONE = "642148996";
 const WHATSAPP = "34642148996";
 
@@ -344,7 +343,11 @@ async function updatePlanPrice(id:string, value:string) {
           <Text style={s.section}>Servicios</Text>
           <View style={s.grid}>{services.map(x=>
             <TouchableOpacity key={x.id} style={s.card} onPress={()=>{setServiceId(x.id);setTab("reservar")}}>
-              <Text style={s.cardTitle}>{x.name}</Text><Text style={s.small}>A domicilio</Text>
+              <Text style={s.itemTitle}>{x.name}</Text>
+<Text style={s.small}>A domicilio</Text>
+{x.base_price != null && (
+  <Text style={s.small}>Desde {x.base_price} € / hora</Text>
+)}
             </TouchableOpacity>)}
           </View>
         </>}
@@ -368,12 +371,16 @@ async function updatePlanPrice(id:string, value:string) {
           <Text style={s.section}>Nueva reserva</Text>
           <Text style={s.label}>Servicio</Text>
           {services.map(x=><TouchableOpacity key={x.id} style={[s.option, serviceId===x.id&&s.optionActive]} onPress={()=>setServiceId(x.id)}>
-            <Text style={serviceId===x.id?s.optionTextActive:s.optionText}>{x.name}</Text>
+            <Text style={serviceId===x.id?s.optionTextActive:s.optionText}>
+  {x.name}{x.base_price != null ? ` · Desde ${x.base_price} € / hora` : ""}
+</Text>
           </TouchableOpacity>)}
           <Text style={[s.label,{marginTop:14}]}>Plan de mantenimiento (opcional)</Text>
           <TouchableOpacity style={[s.option,!planId&&s.optionActive]} onPress={()=>setPlanId(null)}><Text style={!planId?s.optionTextActive:s.optionText}>Servicio puntual</Text></TouchableOpacity>
           {plans.map(x=><TouchableOpacity key={x.id} style={[s.option, planId===x.id&&s.optionActive]} onPress={()=>setPlanId(x.id)}>
-            <Text style={planId===x.id?s.optionTextActive:s.optionText}>{x.name}</Text>
+            <Text style={planId===x.id?s.optionTextActive:s.optionText}>
+  {x.name}{x.base_price != null ? ` · Desde ${x.base_price} € / hora` : ""}
+</Text>
           </TouchableOpacity>)}
           <TextInput style={s.input} placeholder="Nombre y apellidos" value={name} onChangeText={setName}/>
           <TextInput style={s.input} placeholder="Teléfono" value={phone} onChangeText={setPhone} keyboardType="phone-pad"/>
@@ -421,7 +428,11 @@ async function updatePlanPrice(id:string, value:string) {
         {tab==="planes" && <>
           <Text style={s.section}>Planes de mantenimiento</Text>
           {plans.map(p=><View style={s.planCard} key={p.id}>
-            <Text style={s.planName}>{p.name}</Text><Text style={s.planDesc}>{p.description}</Text>
+            <Text style={s.planName}>{p.name}</Text>
+<Text style={s.planDesc}>{p.description}</Text>
+{p.base_price != null && (
+  <Text style={s.planDesc}>Desde {p.base_price} € / hora</Text>
+)}
             <TouchableOpacity style={s.primary} onPress={()=>{setPlanId(p.id);setTab("reservar")}}><Text style={s.primaryText}>ELEGIR PLAN</Text></TouchableOpacity>
           </View>)}
         </>}
