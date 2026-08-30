@@ -238,8 +238,8 @@ async function updatePlanPrice(id:string, value:string) {
 
   async function loadCatalog() {
     const [{data:s},{data:p}] = await Promise.all([
-      supabase.from("services").select("id,name,description").eq("active", true).order("name"),
-      supabase.from("maintenance_plans").select("id,name,description").eq("active", true).order("name"),
+      supabase.from("services").select("id,name,description,base_price").eq("active", true).order("name"),
+supabase.from("maintenance_plans").select("id,name,description,base_price:price_per_visit").eq("active", true).order("name")
     ]);
     setServices(s || []);
     setPlans(p || []);
