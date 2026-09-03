@@ -21,7 +21,7 @@
     .hero{margin:0 -14px 20px;padding:20px 16px 26px;background:
       radial-gradient(circle at 85% 0,#b97636 0,transparent 34%),
       linear-gradient(135deg,#4b160e,#7f2d1c);color:white;box-shadow:0 10px 32px #51201738}
-    .heroInner{max-width:1080px;margin:auto}.coverPhoto{margin:-20px -16px 18px;height:330px;overflow:hidden}.coverPhoto img{width:100%;height:100%;object-fit:cover;display:block}@media(max-width:760px){.coverPhoto{height:240px}}
+    .heroInner{max-width:1080px;margin:auto}.coverPhoto{margin:18px -16px 18px;height:340px;overflow:hidden;border-radius:18px;border:1px solid #ffffff33;background:#3d130c}.coverPhoto img{width:100%;height:100%;object-fit:cover;display:block}@media(max-width:760px){.coverPhoto{height:250px;margin:16px -16px 16px;border-radius:0}}
     .topbar{display:flex;align-items:center;gap:10px}
     .brand{flex:1}.brand h1{margin:0;font-size:30px;letter-spacing:.2px}
     .brand p{margin:3px 0 0;opacity:.9}
@@ -51,8 +51,8 @@
     .actions{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
     .message{margin-top:10px;font-weight:700}.ok{color:#17653a}.err{color:#a02727}.muted{color:var(--muted);font-size:13px}
     .prizeCard{overflow:hidden;border-radius:18px;border:1px solid var(--line);background:#fffaf4;margin:10px 0}
-    .prizeMedia{min-height:140px;background:linear-gradient(135deg,#ead6b2,#fff8eb);display:flex;align-items:center;justify-content:center;color:#7f5c28;font-weight:900;text-align:center;padding:20px}
-    .prizeMedia img{width:100%;height:auto;display:block;max-height:440px;object-fit:cover}
+    .prizeMedia{min-height:140px;background:#f7ead0;display:flex;align-items:center;justify-content:center;color:#7f5c28;font-weight:900;text-align:center;padding:0;overflow:hidden}
+    .prizeMedia img{width:100%;height:auto;display:block;max-height:none;object-fit:cover}
     .prizeBody{padding:15px}.prizeBody b{color:var(--wine);font-size:18px}
     .install{position:fixed;left:14px;right:14px;bottom:14px;z-index:20;max-width:600px;margin:auto;display:none;box-shadow:0 12px 30px #0003}
     .hidden{display:none!important}
@@ -66,7 +66,6 @@
 <body>
   <div class="hero">
     <div class="heroInner">
-      <div class="coverPhoto"><img src="./portada-premio.jpg" alt="Set artesanal kit en cuero y plata"></div>
       <div class="topbar">
         <div class="brand">
           <h1 id="title">Sorteo</h1>
@@ -74,6 +73,7 @@
         </div>
         <button class="pillBtn" onclick="openAdmin()">Administrar</button>
       </div>
+      <div class="coverPhoto"><img src="./portada-premio.jpg?v=3" alt="Set artesanal kit en cuero y plata"></div>
       <div class="heroCard">
         <p class="heroTitle">Sorteo del 12/10/2026</p>
         <p class="heroText" id="reference">Resultado vinculado a los dos últimos números del sorteo extraordinario de la Lotería Nacional del 12/10/2026.</p>
@@ -246,7 +246,7 @@ function renderPublic(){
   $("numbers").innerHTML=DATA.numbers.map(n=>'<button class="num '+clean(n.status)+(selectedNumber===n.number?' selected':'')+'" '+(n.status!=="free"?'disabled':'')+' onclick="pick('+n.number+')">'+fmt(n.number)+'</button>').join("");
   const active=DATA.prizes.filter(p=>p.enabled);
   $("prizes").innerHTML=active.length?active.map(p=>{
-    const img=p.position===1?"./portada-premio.jpg":(p.image_url||p.image_url_2);
+    const img=p.position===1?"./portada-premio.jpg?v=3":(p.image_url||p.image_url_2);
     return '<div class="prizeCard">'+
       '<div class="prizeMedia">'+(img?'<img src="'+clean(img)+'" alt="Imagen del premio">':'Set artesanal kit en cuero y plata · Paraguay Asturias')+'</div>'+
       '<div class="prizeBody"><b>'+p.position+'.º premio · '+clean(p.title)+'</b>'+(p.description?'<p>'+clean(p.description)+'</p>':'')+'</div>'+
@@ -377,7 +377,7 @@ async function toggleAdmin(email,active){
 
 window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;$("installBtn").style.display="block"});
 async function installApp(){if(!deferredPrompt){alert("En Android: abre el menú del navegador y pulsa “Instalar aplicación” o “Añadir a pantalla de inicio”.");return}deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;$("installBtn").style.display="none"}
-if("serviceWorker" in navigator)navigator.serviceWorker.register("./sw.js?v=2").then(r=>r.update()).catch(()=>{});
+if("serviceWorker" in navigator)navigator.serviceWorker.register("./sw.js?v=3").then(r=>r.update()).catch(()=>{});
 loadPublic();
 </script>
 </body>
