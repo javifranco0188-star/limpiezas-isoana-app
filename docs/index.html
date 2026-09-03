@@ -206,7 +206,7 @@
 const SUPABASE_URL="https://jqmcpricmwzggleupxwp.supabase.co";
 const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxbWNwcmljbXd6Z2dsZXVweHdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwMDQzMjUsImV4cCI6MjEwMzU4MDMyNX0.-hAGr-rGNQyWzqqn93bMa4F6azwkgelxwTs_W4qAoy0";
 const PRIMARY_EMAIL="javifranco0188@gmail.com";
-let DATA=null, selectedNumber=null, token=localStorage.getItem("raffle_token")||"", currentUser=null, deferredPrompt=null;
+let DATA=null, selectedNumber=null, token=localStorage.getItem("raffle_token")||"", currentUser=null, deferredPrompt=null, ADMIN_ORDERS=[];
 
 const $=id=>document.getElementById(id);
 const clean=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -312,7 +312,7 @@ async function loadAdmin(){
       api("/rest/v1/raffle_prizes?select=*&order=position",{auth:true}),
       api("/auth/v1/user",{auth:true})
     ]);
-    currentUser=me;$("loginBox").classList.add("hidden");$("adminPanel").classList.remove("hidden");
+    currentUser=me;ADMIN_ORDERS=orders;$("loginBox").classList.add("hidden");$("adminPanel").classList.remove("hidden");
     const mine=await api("/rest/v1/raffle_admins?select=active,is_owner&user_id=eq."+me.id,{auth:true});
     const isOwner=!!mine[0]?.is_owner;
     $("adminIdentity").textContent=isOwner?"Administrador principal · "+(me.email||PRIMARY_EMAIL):"Administrador · "+(me.email||"");
@@ -341,7 +341,17 @@ async function saveSettings(){
   }catch(e){msg("settingsMsg",e.message,"err")}
 }
 async function orderAction(id,status){
-  try{await api("/rest/v1/rpc/admin_set_raffle_order_status",{method:"POST",auth:true,body:JSON.stringify({p_order_id:id,p_status:status})});await loadPublic();await loadAdmin()}catch(e){alert(e.message)}
+  const order=ADMIN_ORDERS.find(o=>o.id===id);
+  try{
+    await api("/rest/v1/rpc/admin_set_raffle_order_status",{method:"POST",auth:true,body:JSON.stringify({p_order_id:id,p_status:status})});
+    await loadPublic();
+    await loadAdmin();
+    if(status==="confirmed" && order?.participant_phone){
+      const phone=String(order.participant_phone).replace(/\D/g,"");
+      const message="Hola "+(order.participant_name||"")+", te contacto por tu reserva del número "+fmt(order.number)+" del sorteo. La reserva está confirmada. Coordinamos por aquí el pago. Gracias.";
+      window.location.href="https://wa.me/"+phone+"?text="+encodeURIComponent(message);
+    }
+  }catch(e){alert(e.message)}
 }
 async function savePrizes(){
   try{
@@ -377,7 +387,7 @@ async function toggleAdmin(email,active){
 
 window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;$("installBtn").style.display="block"});
 async function installApp(){if(!deferredPrompt){alert("En Android: abre el menú del navegador y pulsa “Instalar aplicación” o “Añadir a pantalla de inicio”.");return}deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;$("installBtn").style.display="none"}
-if("serviceWorker" in navigator)navigator.serviceWorker.register("./sw.js?v=4").then(r=>r.update()).catch(()=>{});
+if("serviceWorker" in navigator)navigator.serviceWorker.register("./sw.js?v=5").then(r=>r.update()).catch(()=>{});
 loadPublic();
 </script>
 </body>
