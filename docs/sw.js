@@ -1,8 +1,16 @@
-const CACHE="sorteo-oviedo-v2";
-const ASSETS=["./","./index.html","./manifest.webmanifest","./icon.svg","./portada-premio.jpg"];
+const CACHE="sorteo-oviedo-v3";
+const ASSETS=["./","./index.html","./manifest.webmanifest","./icon.svg","./portada-premio.jpg?v=3"];
 self.addEventListener("install",e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)))});
 self.addEventListener("activate",e=>e.waitUntil(Promise.all([self.clients.claim(),caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))))])));
 self.addEventListener("fetch",e=>{
  if(e.request.method!=="GET")return;
- e.respondWith(fetch(e.request).then(r=>{const copy=r.clone();caches.open(CACHE).then(c=>c.put(e.request,copy)).catch(()=>{});return r}).catch(()=>caches.match(e.request).then(r=>r||caches.match("./"))));
+ const req=e.request;
+ const isNav=req.mode==="navigate";
+ e.respondWith(
+   fetch(req,{cache:"no-store"}).then(r=>{
+     const copy=r.clone();
+     caches.open(CACHE).then(c=>c.put(req,copy)).catch(()=>{});
+     return r;
+   }).catch(()=>caches.match(req).then(r=>r||(isNav?caches.match("./index.html"):undefined)))
+ );
 });
