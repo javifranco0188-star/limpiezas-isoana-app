@@ -1,5 +1,5 @@
-const CACHE="sorteo-oviedo-v4";
-const ASSETS=["./","./index.html","./manifest.webmanifest","./icon.svg","./portada-premio.jpg?v=4"];
+const CACHE="sorteo-oviedo-v5";
+const ASSETS=["./","./index.html","./manifest.webmanifest","./icon.svg","./portada-premio.jpg?v=5"];
 self.addEventListener("install",e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)))});
 self.addEventListener("activate",e=>e.waitUntil(Promise.all([self.clients.claim(),caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))))])));
 self.addEventListener("fetch",e=>{
