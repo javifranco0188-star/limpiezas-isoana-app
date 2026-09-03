@@ -211,6 +211,13 @@ let DATA=null, selectedNumber=null, token=localStorage.getItem("raffle_token")||
 const $=id=>document.getElementById(id);
 const clean=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmt=n=>String(n).padStart(2,"0");
+function waPhone(value){
+  let p=String(value||"").replace(/\D/g,"");
+  if(!p)return "";
+  if(p.startsWith("00"))p=p.slice(2);
+  if(p.length===9)p="34"+p;
+  return p;
+}
 function authHeaders(useToken=false){return {
   apikey:SUPABASE_KEY,
   Authorization:"Bearer "+(useToken&&token?token:SUPABASE_KEY),
@@ -260,15 +267,22 @@ async function reserveNumber(){
   if(selectedNumber===null)return msg("reserveMsg","Selecciona primero un número.","err");
   if(!$("adult").checked)return msg("reserveMsg","Debes confirmar que eres mayor de 18 años.","err");
   const name=$("name").value.trim(),phone=$("phone").value.trim(),email=$("email").value.trim();
+  if(name.length<7 && phone.length<7)return msg("reserveMsg","Introduce tus datos correctamente.","err");
   if(name.length<2)return msg("reserveMsg","Introduce tu nombre.","err");
   if(phone.length<7)return msg("reserveMsg","Introduce un teléfono válido.","err");
   const chosen=selectedNumber;
   try{
     await api("/rest/v1/rpc/reserve_raffle_number",{method:"POST",body:JSON.stringify({p_number:chosen,p_name:name,p_phone:phone,p_email:email||null})});
-    msg("reserveMsg","Reserva registrada. El administrador confirmará la compra.");
-    const wa=DATA.settings?.whatsapp_phone;
-    if(wa){$("whatsapp").href="https://wa.me/"+String(wa).replace(/\D/g,"")+"?text="+encodeURIComponent("Hola, he reservado el número "+fmt(chosen)+" para el sorteo. Nombre: "+name);$("whatsapp").classList.remove("hidden")}
-    selectedNumber=null;await loadPublic();
+    const adminPhone=waPhone(DATA.settings?.whatsapp_phone);
+    const price=DATA.settings?.number_price;
+    const message="Hola, soy "+name+". He reservado el número "+fmt(chosen)+" del sorteo"+(price?" ("+price+" €)":"")+". Mi teléfono es "+phone+". Quiero coordinar el pago y la confirmación de mi número.";
+    msg("reserveMsg","Reserva registrada. Te abrimos WhatsApp para coordinar el pago.");
+    selectedNumber=null;
+    if(adminPhone){
+      window.location.href="https://wa.me/"+adminPhone+"?text="+encodeURIComponent(message);
+      return;
+    }
+    await loadPublic();
   }catch(e){msg("reserveMsg",e.message,"err");await loadPublic()}
 }
 
@@ -320,8 +334,11 @@ async function loadAdmin(){
     const s=settings[0]||{};$("setWa").value=s.whatsapp_phone||"";$("setPrice").value=s.number_price||"";$("setRef").value=s.draw_reference||"";
     $("orders").innerHTML=orders.length?orders.map(o=>{
       let act="";
-      if(o.status==="reserved")act='<button class="mini" onclick="orderAction(\''+o.id+'\',\'confirmed\')">Confirmar</button> <button class="mini" onclick="orderAction(\''+o.id+'\',\'cancelled\')">Liberar</button>';
-      return "<tr><td>"+fmt(o.number)+"</td><td>"+clean(o.participant_name)+"</td><td>"+clean(o.participant_phone)+"</td><td>"+clean(o.status)+"</td><td>"+act+"</td></tr>";
+      if(o.status==="reserved")act='<button class="mini" onclick="orderAction(\''+o.id+'\',\'confirmed\')">Confirmar</button> <button class="mini" onclick="contactOrder(\''+o.id+'\')">WhatsApp</button> <button class="mini" onclick="orderAction(\''+o.id+'\',\'cancelled\')">Liberar</button>';
+      if(o.status==="confirmed")act='<button class="mini" onclick="contactOrder(\''+o.id+'\')">WhatsApp</button> <button class="mini" onclick="orderAction(\''+o.id+'\',\'cancelled\')">Liberar</button>';
+      if(o.status==="cancelled")act='<button class="mini" onclick="orderAction(\''+o.id+'\',\'reserved\')">Reabrir reserva</button>';
+      const label=o.status==="confirmed"?"Comprado":(o.status==="reserved"?"Reservado":"Liberado");
+      return "<tr><td>"+fmt(o.number)+"</td><td>"+clean(o.participant_name)+"</td><td>"+clean(o.participant_phone)+"</td><td>"+label+"</td><td>"+act+"</td></tr>";
     }).join(""):'<tr><td colspan="5">Todavía no hay reservas.</td></tr>';
     $("adminPrizes").innerHTML=prizes.map(p=>'<div class="prizeCard"><div class="prizeBody"><b>'+p.position+'.º premio</b>'+
       '<label style="margin-top:10px">Activo <input id="pe'+p.position+'" type="checkbox" style="width:auto" '+(p.enabled?'checked':'')+'></label>'+
@@ -340,16 +357,23 @@ async function saveSettings(){
     msg("settingsMsg","Configuración guardada.");await loadPublic();
   }catch(e){msg("settingsMsg",e.message,"err")}
 }
+function contactOrder(id){
+  const order=ADMIN_ORDERS.find(o=>o.id===id);
+  if(!order)return alert("No se encontró la reserva.");
+  const phone=waPhone(order.participant_phone);
+  if(!phone)return alert("La reserva no tiene un teléfono válido.");
+  const price=DATA?.settings?.number_price;
+  const message="Hola "+(order.participant_name||"")+", te contacto por tu reserva del número "+fmt(order.number)+" del sorteo"+(price?" ("+price+" €)":"")+". Coordinamos por aquí el pago y la confirmación. Gracias.";
+  window.location.href="https://wa.me/"+phone+"?text="+encodeURIComponent(message);
+}
 async function orderAction(id,status){
   const order=ADMIN_ORDERS.find(o=>o.id===id);
   try{
     await api("/rest/v1/rpc/admin_set_raffle_order_status",{method:"POST",auth:true,body:JSON.stringify({p_order_id:id,p_status:status})});
     await loadPublic();
     await loadAdmin();
-    if(status==="confirmed" && order?.participant_phone){
-      const phone=String(order.participant_phone).replace(/\D/g,"");
-      const message="Hola "+(order.participant_name||"")+", te contacto por tu reserva del número "+fmt(order.number)+" del sorteo. La reserva está confirmada. Coordinamos por aquí el pago. Gracias.";
-      window.location.href="https://wa.me/"+phone+"?text="+encodeURIComponent(message);
+    if(status==="confirmed" && order){
+      contactOrder(id);
     }
   }catch(e){alert(e.message)}
 }
@@ -387,7 +411,7 @@ async function toggleAdmin(email,active){
 
 window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;$("installBtn").style.display="block"});
 async function installApp(){if(!deferredPrompt){alert("En Android: abre el menú del navegador y pulsa “Instalar aplicación” o “Añadir a pantalla de inicio”.");return}deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;$("installBtn").style.display="none"}
-if("serviceWorker" in navigator)navigator.serviceWorker.register("./sw.js?v=5").then(r=>r.update()).catch(()=>{});
+if("serviceWorker" in navigator)navigator.serviceWorker.register("./sw.js?v=6").then(r=>r.update()).catch(()=>{});
 loadPublic();
 </script>
 </body>
