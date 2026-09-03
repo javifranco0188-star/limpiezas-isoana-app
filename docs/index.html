@@ -1,0 +1,1449 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#111827">
+  <title>Sorteo</title>
+
+  <style>
+    :root{
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+      color:#172033;
+      background:#f4f6fa
+    }
+    *{box-sizing:border-box}
+    body{margin:0}
+    header{
+      background:#111827;
+      color:#fff;
+      padding:18px 14px;
+      position:sticky;
+      top:0;
+      z-index:5
+    }
+    .wrap{max-width:1000px;margin:auto}
+    h1{margin:0;font-size:24px}
+    h2{margin-top:5px}
+    .sub{opacity:.8;font-size:13px}
+    .card{
+      background:#fff;
+      border-radius:18px;
+      padding:16px;
+      margin:14px 0;
+      box-shadow:0 5px 20px #0000000d
+    }
+    .row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(10,1fr);
+      gap:7px
+    }
+    .num{
+      border:0;
+      border-radius:11px;
+      padding:13px 3px;
+      font-weight:800;
+      cursor:pointer
+    }
+    .free{background:#e8f8ee;color:#176b36}
+    .reserved{background:#fff3d4;color:#8a5a00}
+    .sold{background:#ffe4e6;color:#9f1239}
+    .sel{outline:3px solid #111827}
+
+    button,.btn{
+      display:inline-block;
+      border:0;
+      border-radius:11px;
+      padding:11px 14px;
+      font-weight:750;
+      cursor:pointer;
+      text-decoration:none
+    }
+
+    .primary{background:#111827;color:#fff}
+    .wa{background:#20c65a;color:#fff}
+    .muted{background:#e5e7eb;color:#111827}
+    .danger{background:#be123c;color:#fff}
+
+    input,textarea,select{
+      width:100%;
+      padding:11px;
+      border:1px solid #d1d5db;
+      border-radius:10px;
+      margin:5px 0 10px;
+      background:#fff
+    }
+
+    .badge{
+      display:inline-block;
+      padding:5px 9px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800
+    }
+
+    .bfree{background:#e8f8ee}
+    .bres{background:#fff3d4}
+    .bsold{background:#ffe4e6}
+
+    .hidden{display:none!important}
+
+    .top{
+      display:flex;
+      gap:8px;
+      align-items:center
+    }
+
+    .notice{
+      padding:10px 12px;
+      border-radius:10px;
+      background:#eef2ff;
+      margin:10px 0
+    }
+
+    .prizeimg{
+      max-width:100%;
+      max-height:280px;
+      border-radius:14px;
+      display:block;
+      margin:10px 0
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:14px
+    }
+
+    td,th{
+      padding:8px;
+      border-bottom:1px solid #e5e7eb;
+      text-align:left
+    }
+
+    .small{
+      font-size:12px;
+      color:#667085
+    }
+
+    .ok{
+      color:#176b36;
+      font-weight:700;
+      margin-top:10px
+    }
+
+    .error{
+      color:#be123c;
+      font-weight:700;
+      margin-top:10px
+    }
+
+    @media(max-width:700px){
+      .row{grid-template-columns:1fr}
+      .grid{grid-template-columns:repeat(5,1fr)}
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="top">
+      <div style="flex:1">
+        <h1 id="title">Sorteo</h1>
+        <div class="sub" id="subtitle">Oviedo, Asturias</div>
+      </div>
+
+      <button class="muted" onclick="showAdmin()">
+        Administrar
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" style="padding:8px 14px 40px">
+
+  <section class="card">
+    <div class="row">
+      <div>
+        <b>Estado de números</b>
+        <p>
+          <span class="badge bfree">Libre</span>
+          <span class="badge bres">Reservado</span>
+          <span class="badge bsold">Comprado</span>
+        </p>
+      </div>
+
+      <div>
+        <b>Fecha del sorteo</b>
+        <p id="drawDate">—</p>
+      </div>
+    </div>
+
+    <div class="notice" id="ref"></div>
+  </section>
+
+  <section class="card">
+    <h2>Números</h2>
+    <div id="numbers" class="grid"></div>
+  </section>
+
+  <section class="card">
+    <h2>Reservar número</h2>
+
+    <p id="picked">
+      Selecciona un número libre.
+    </p>
+
+    <div class="row">
+
+      <label>
+        Nombre
+        <input id="name" autocomplete="name">
+      </label>
+
+      <label>
+        Teléfono
+        <input id="phone" inputmode="tel" autocomplete="tel">
+      </label>
+
+    </div>
+
+    <label>
+      Email
+      <input id="email" type="email" autocomplete="email">
+    </label>
+
+    <label style="display:flex;align-items:center;gap:8px">
+      <input
+        id="adult"
+        type="checkbox"
+        style="width:auto;margin:0"
+      >
+      Confirmo que soy mayor de 18 años
+    </label>
+
+    <br>
+
+    <button class="primary" onclick="reserveNumber()">
+      Reservar
+    </button>
+
+    <a
+      id="whatsapp"
+      class="btn wa hidden"
+      target="_blank"
+      rel="noopener"
+    >
+      Continuar por WhatsApp
+    </a>
+
+    <div id="msg"></div>
+  </section>
+
+  <section class="card">
+    <h2>Premios</h2>
+    <div id="prizes"></div>
+  </section>
+
+  <section class="card">
+    <h2>Ganadores</h2>
+    <div id="winners">
+      Aún no publicados.
+    </div>
+  </section>
+
+  <section id="admin" class="card hidden">
+
+    <h2>Panel administrativo</h2>
+
+    <div id="loginBox">
+
+      <label>
+        Email
+        <input
+          id="adminEmail"
+          placeholder="Email del administrador"
+          type="email"
+        >
+      </label>
+
+      <label>
+        Contraseña
+        <input
+          id="adminPass"
+          type="password"
+        >
+      </label>
+
+      <button class="primary" onclick="login()">
+        Entrar
+      </button>
+
+      <div id="loginMsg"></div>
+
+    </div>
+
+    <div id="adminBox" class="hidden">
+
+      <h3>Configuración</h3>
+
+      <div class="row">
+
+        <label>
+          WhatsApp
+          <input
+            id="setWa"
+            placeholder="346XXXXXXXX"
+          >
+        </label>
+
+        <label>
+          Precio por número (€)
+          <input
+            id="setPrice"
+            type="number"
+            step="0.01"
+          >
+        </label>
+
+      </div>
+
+      <label>
+        Referencia del sorteo
+        <textarea id="setRef"></textarea>
+      </label>
+
+      <button
+        class="primary"
+        onclick="saveSettings()"
+      >
+        Guardar configuración
+      </button>
+
+      <h3>Reservas y compras</h3>
+
+      <div style="overflow:auto">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>Nº</th>
+              <th>Nombre</th>
+              <th>Teléfono</th>
+              <th>Estado</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+
+          <tbody id="orders"></tbody>
+
+        </table>
+
+      </div>
+
+      <h3>Premios</h3>
+
+      <div id="adminPrizes"></div>
+
+      <button
+        class="primary"
+        onclick="savePrizes()"
+      >
+        Guardar premios
+      </button>
+
+      <h3>Publicar ganadores</h3>
+
+      <div class="row">
+
+        <input
+          id="win1"
+          type="number"
+          min="0"
+          max="99"
+          placeholder="1º número"
+        >
+
+        <input
+          id="win2"
+          type="number"
+          min="0"
+          max="99"
+          placeholder="2º premio opcional"
+        >
+
+      </div>
+
+      <input
+        id="win3"
+        type="number"
+        min="0"
+        max="99"
+        placeholder="3º premio opcional"
+      >
+
+      <button
+        class="primary"
+        onclick="publishWinners()"
+      >
+        Publicar ganadores
+      </button>
+
+      <p class="small">
+        Solo el administrador autorizado puede modificar el sorteo.
+      </p>
+
+    </div>
+
+  </section>
+
+</main>
+
+<script>
+
+const SUPABASE_URL =
+"https://jqmcpricmwzggleupxwp.supabase.co";
+
+const SUPABASE_KEY =
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxbWNwcmljbXd6Z2dsZXVweHdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwMDQzMjUsImV4cCI6MjEwMzU4MDMyNX0.-hAGr-rGNQyWzqqn93bMa4F6azwkgelxwTs_W4qAoy0";
+
+let DATA = null;
+let selectedNumber = null;
+
+let adminToken =
+localStorage.getItem("raffle_token") || "";
+
+const el = id =>
+document.getElementById(id);
+
+function headers(auth = false) {
+
+  const result = {
+    "apikey": SUPABASE_KEY,
+    "Authorization": "Bearer " + (auth && adminToken ? adminToken : SUPABASE_KEY),
+    "Content-Type": "application/json"
+  };
+
+  return result;
+}
+
+async function api(path, options = {}) {
+
+  const response =
+    await fetch(
+      SUPABASE_URL + path,
+      {
+        ...options,
+        headers: {
+          ...headers(options.auth === true),
+          ...(options.headers || {})
+        }
+      }
+    );
+
+  const text =
+    await response.text();
+
+  let data = null;
+
+  if (text) {
+    try {
+      data = JSON.parse(text);
+    }
+    catch {
+      data = text;
+    }
+  }
+
+  if (!response.ok) {
+
+    throw new Error(
+      data?.message ||
+      data?.error_description ||
+      data?.hint ||
+      "Ha ocurrido un error"
+    );
+
+  }
+
+  return data;
+}
+
+function escapeHtml(value) {
+
+  return String(value ?? "")
+    .replace(
+      /[&<>"']/g,
+      character => ({
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#39;"
+      }[character])
+    );
+
+}
+
+function formatNumber(number) {
+
+  return String(number)
+    .padStart(2,"0");
+
+}
+
+async function loadPublicData() {
+
+  try {
+
+    const [
+      settings,
+      numbers,
+      prizes,
+      winners
+    ] =
+    await Promise.all([
+
+      api(
+        "/rest/v1/raffle_settings?select=*&limit=1"
+      ),
+
+      api(
+        "/rest/v1/raffle_numbers?select=number,status&order=number"
+      ),
+
+      api(
+        "/rest/v1/raffle_prizes?select=*&order=position"
+      ),
+
+      api(
+        "/rest/v1/raffle_winners?select=*&published=eq.true&order=position"
+      )
+
+    ]);
+
+    DATA = {
+      settings: settings[0],
+      numbers,
+      prizes,
+      winners
+    };
+
+    renderPublic();
+
+  }
+  catch (error) {
+
+    console.error(error);
+
+    el("numbers").innerHTML =
+      "<p class='error'>No se pudieron cargar los números. Vuelve a intentarlo en unos segundos.</p>";
+    el("prizes").innerHTML =
+      "<p class='error'>No se pudieron cargar los premios.</p>";
+
+  }
+
+}
+
+function renderPublic() {
+
+  const settings =
+    DATA.settings || {};
+
+  el("title").textContent =
+    settings.title || "Sorteo";
+
+  el("subtitle").textContent =
+    settings.location ||
+    "Oviedo, Asturias";
+
+  el("drawDate").textContent =
+    settings.draw_date
+      ? settings.draw_date.split("-").reverse().join("/")
+      : "—";
+
+  el("ref").textContent =
+    settings.draw_reference || "";
+
+  el("numbers").innerHTML =
+    DATA.numbers
+    .map(number => {
+
+      const selected =
+        selectedNumber === number.number
+        ? " sel"
+        : "";
+
+      const disabled =
+        number.status !== "free"
+        ? " disabled"
+        : "";
+
+      return `
+        <button
+          class="num ${number.status}${selected}"
+          ${disabled}
+          onclick="pickNumber(${number.number})"
+        >
+          ${formatNumber(number.number)}
+        </button>
+      `;
+
+    })
+    .join("");
+
+  const activePrizes =
+    DATA.prizes
+    .filter(prize => prize.enabled);
+
+  el("prizes").innerHTML =
+    activePrizes.length
+    ? activePrizes.map(prize => {
+
+        return `
+          <div class="card">
+
+            <b>
+              ${prize.position}º premio:
+            </b>
+
+            ${escapeHtml(prize.title)}
+
+            ${
+              prize.description
+              ? `<p>${escapeHtml(prize.description)}</p>`
+              : ""
+            }
+
+            ${
+              prize.image_url
+              ? `<img
+                   class="prizeimg"
+                   src="${escapeHtml(prize.image_url)}"
+                   alt="Premio"
+                 >`
+              : ""
+            }
+
+          </div>
+        `;
+
+      }).join("")
+    : "Sin premios configurados.";
+
+  el("winners").innerHTML =
+    DATA.winners.length
+    ? DATA.winners
+      .map(winner => `
+        <p>
+          <b>${winner.position}º premio:</b>
+          número
+          ${formatNumber(winner.winning_number)}
+        </p>
+      `)
+      .join("")
+    : "Aún no publicados.";
+
+}
+
+function pickNumber(number) {
+
+  selectedNumber = number;
+
+  el("picked").textContent =
+    "Número seleccionado: " +
+    formatNumber(number);
+
+  renderPublic();
+
+}
+
+async function reserveNumber() {
+
+  const message = el("msg");
+
+  message.className = "";
+  message.textContent = "";
+
+  el("whatsapp")
+    .classList.add("hidden");
+
+  if (selectedNumber === null) {
+
+    message.className = "error";
+
+    message.textContent =
+      "Selecciona primero un número.";
+
+    return;
+  }
+
+  if (!el("adult").checked) {
+
+    message.className = "error";
+
+    message.textContent =
+      "Debes confirmar que eres mayor de 18 años.";
+
+    return;
+  }
+
+  const name =
+    el("name").value.trim();
+
+  const phone =
+    el("phone").value.trim();
+
+  const email =
+    el("email").value.trim();
+
+  if (name.length < 2) {
+
+    message.className = "error";
+    message.textContent =
+      "Introduce tu nombre.";
+
+    return;
+  }
+
+  if (phone.length < 7) {
+
+    message.className = "error";
+    message.textContent =
+      "Introduce un teléfono válido.";
+
+    return;
+  }
+
+  try {
+
+    const reserved =
+      selectedNumber;
+
+    await api(
+      "/rest/v1/rpc/reserve_raffle_number",
+      {
+        method:"POST",
+        body:JSON.stringify({
+          p_number: reserved,
+          p_name: name,
+          p_phone: phone,
+          p_email:
+            email || null
+        })
+      }
+    );
+
+    message.className = "ok";
+
+    message.textContent =
+      "Reserva registrada correctamente. " +
+      "El administrador debe confirmar la compra.";
+
+    const whatsapp =
+      DATA.settings
+      ?.whatsapp_phone;
+
+    if (whatsapp) {
+
+      const text =
+        encodeURIComponent(
+          "Hola, he reservado el número " +
+          formatNumber(reserved) +
+          " para el sorteo. Nombre: " +
+          name
+        );
+
+      el("whatsapp").href =
+        "https://wa.me/" +
+        String(whatsapp)
+        .replace(/\D/g,"") +
+        "?text=" +
+        text;
+
+      el("whatsapp")
+        .classList.remove("hidden");
+
+    }
+
+    selectedNumber = null;
+
+    await loadPublicData();
+
+  }
+  catch (error) {
+
+    message.className = "error";
+    message.textContent =
+      error.message;
+
+    await loadPublicData();
+
+  }
+
+}
+
+function showAdmin() {
+
+  el("admin")
+    .classList.remove("hidden");
+
+  el("admin")
+    .scrollIntoView({
+      behavior:"smooth"
+    });
+
+  if (adminToken) {
+
+    loadAdmin()
+      .catch(() => {});
+
+  }
+
+}
+
+async function login() {
+
+  const loginMessage =
+    el("loginMsg");
+
+  loginMessage.textContent = "";
+  loginMessage.className = "";
+
+  try {
+
+    const response =
+      await fetch(
+        SUPABASE_URL +
+        "/auth/v1/token?grant_type=password",
+        {
+          method:"POST",
+          headers:headers(false),
+          body:JSON.stringify({
+            email:
+              el("adminEmail").value.trim(),
+            password:
+              el("adminPass").value
+          })
+        }
+      );
+
+    const result =
+      await response.json();
+
+    if (!response.ok) {
+
+      throw new Error(
+        result.error_description ||
+        result.msg ||
+        "Email o contraseña incorrectos"
+      );
+
+    }
+
+    adminToken =
+      result.access_token;
+
+    const admin =
+      await api(
+        "/rest/v1/raffle_admins" +
+        "?select=active" +
+        "&user_id=eq." +
+        result.user.id,
+        {
+          auth:true
+        }
+      );
+
+    if (
+      !admin.length ||
+      !admin[0].active
+    ) {
+
+      adminToken = "";
+
+      localStorage.removeItem(
+        "raffle_token"
+      );
+
+      throw new Error(
+        "Este usuario no tiene permisos de administrador."
+      );
+
+    }
+
+    localStorage.setItem(
+      "raffle_token",
+      adminToken
+    );
+
+    loginMessage.className = "ok";
+    loginMessage.textContent =
+      "Acceso correcto.";
+
+    await loadAdmin();
+
+  }
+  catch (error) {
+
+    loginMessage.className = "error";
+    loginMessage.textContent =
+      error.message;
+
+  }
+
+}
+
+async function loadAdmin() {
+
+  const [
+    settings,
+    orders,
+    prizes
+  ] =
+  await Promise.all([
+
+    api(
+      "/rest/v1/raffle_settings?select=*&limit=1",
+      {auth:true}
+    ),
+
+    api(
+      "/rest/v1/raffle_orders?select=*&order=created_at.desc",
+      {auth:true}
+    ),
+
+    api(
+      "/rest/v1/raffle_prizes?select=*&order=position",
+      {auth:true}
+    )
+
+  ]);
+
+  el("loginBox")
+    .classList.add("hidden");
+
+  el("adminBox")
+    .classList.remove("hidden");
+
+  const settingsData =
+    settings[0];
+
+  el("setWa").value =
+    settingsData
+    .whatsapp_phone || "";
+
+  el("setPrice").value =
+    settingsData
+    .number_price || "";
+
+  el("setRef").value =
+    settingsData
+    .draw_reference || "";
+
+  el("orders").innerHTML =
+    orders.length
+    ? orders.map(order => {
+
+        let actions = "";
+
+        if (order.status === "reserved") {
+
+          actions = `
+            <button
+              onclick="orderAction(
+                '${order.id}',
+                'confirmed'
+              )"
+            >
+              Confirmar
+            </button>
+
+            <button
+              class="danger"
+              onclick="orderAction(
+                '${order.id}',
+                'cancelled'
+              )"
+            >
+              Liberar
+            </button>
+          `;
+
+        }
+
+        return `
+          <tr>
+
+            <td>
+              ${formatNumber(order.number)}
+            </td>
+
+            <td>
+              ${escapeHtml(order.participant_name)}
+            </td>
+
+            <td>
+              ${escapeHtml(order.participant_phone)}
+            </td>
+
+            <td>
+              ${escapeHtml(order.status)}
+            </td>
+
+            <td>
+              ${actions}
+            </td>
+
+          </tr>
+        `;
+
+      }).join("")
+    : `
+      <tr>
+        <td colspan="5">
+          Todavía no hay reservas.
+        </td>
+      </tr>
+    `;
+
+  el("adminPrizes").innerHTML =
+    prizes.map(prize => `
+
+      <div class="card">
+
+        <b>
+          ${prize.position}º premio
+        </b>
+
+        <label
+          style="
+            display:flex;
+            gap:8px;
+            align-items:center
+          "
+        >
+
+          Activo
+
+          <input
+            id="pe${prize.position}"
+            type="checkbox"
+            style="width:auto"
+            ${prize.enabled ? "checked" : ""}
+          >
+
+        </label>
+
+        <label>
+
+          Nombre del premio
+
+          <input
+            id="pt${prize.position}"
+            value="${escapeHtml(prize.title)}"
+          >
+
+        </label>
+
+        <label>
+
+          Descripción
+
+          <textarea
+            id="pd${prize.position}"
+          >${escapeHtml(prize.description || "")}</textarea>
+
+        </label>
+
+        <label>
+
+          Foto del premio
+
+          <input
+            id="pf${prize.position}"
+            type="file"
+            accept="image/*"
+          >
+
+        </label>
+
+        <input
+          id="pi${prize.position}"
+          type="hidden"
+          value="${escapeHtml(prize.image_url || "")}"
+        >
+
+        ${
+          prize.image_url
+          ? `
+            <img
+              class="prizeimg"
+              src="${escapeHtml(prize.image_url)}"
+              alt="Premio"
+            >
+          `
+          : ""
+        }
+
+      </div>
+
+    `).join("");
+
+}
+
+async function saveSettings() {
+
+  try {
+
+    const id =
+      DATA.settings.id;
+
+    await api(
+      "/rest/v1/raffle_settings?id=eq." +
+      id,
+      {
+        method:"PATCH",
+        auth:true,
+        body:JSON.stringify({
+
+          whatsapp_phone:
+            el("setWa").value.trim()
+            || null,
+
+          number_price:
+            el("setPrice").value === ""
+            ? null
+            : Number(
+                el("setPrice").value
+              ),
+
+          draw_reference:
+            el("setRef").value.trim()
+            || null,
+
+          updated_at:
+            new Date().toISOString()
+
+        })
+      }
+    );
+
+    alert(
+      "Configuración guardada."
+    );
+
+    await loadPublicData();
+    await loadAdmin();
+
+  }
+  catch (error) {
+
+    alert(error.message);
+
+  }
+
+}
+
+async function orderAction(
+  orderId,
+  status
+) {
+
+  try {
+
+    await api(
+      "/rest/v1/rpc/set_raffle_order_status",
+      {
+        method:"POST",
+        auth:true,
+        body:JSON.stringify({
+          p_order:orderId,
+          p_status:status
+        })
+      }
+    );
+
+    await loadPublicData();
+    await loadAdmin();
+
+  }
+  catch (error) {
+
+    alert(error.message);
+
+  }
+
+}
+
+async function uploadPrizeImage(
+  position
+) {
+
+  const input =
+    el("pf" + position);
+
+  const previous =
+    el("pi" + position)
+    .value;
+
+  if (
+    !input.files ||
+    !input.files[0]
+  ) {
+
+    return previous || null;
+
+  }
+
+  const file =
+    input.files[0];
+
+  const safeName =
+    file.name.replace(
+      /[^a-zA-Z0-9._-]/g,
+      "_"
+    );
+
+  const path =
+    "premio-" +
+    position +
+    "-" +
+    Date.now() +
+    "-" +
+    safeName;
+
+  const response =
+    await fetch(
+      SUPABASE_URL +
+      "/storage/v1/object/" +
+      "raffle-prizes/" +
+      path,
+      {
+        method:"POST",
+        headers:{
+          "apikey":
+            SUPABASE_KEY,
+
+          "Authorization":
+            "Bearer " +
+            adminToken,
+
+          "Content-Type":
+            file.type ||
+            "application/octet-stream"
+        },
+        body:file
+      }
+    );
+
+  if (!response.ok) {
+
+    throw new Error(
+      "No se pudo subir la imagen."
+    );
+
+  }
+
+  return (
+    SUPABASE_URL +
+    "/storage/v1/object/public/" +
+    "raffle-prizes/" +
+    path
+  );
+
+}
+
+async function savePrizes() {
+
+  try {
+
+    for (
+      let position = 1;
+      position <= 3;
+      position++
+    ) {
+
+      const imageUrl =
+        await uploadPrizeImage(
+          position
+        );
+
+      await api(
+        "/rest/v1/raffle_prizes" +
+        "?position=eq." +
+        position,
+        {
+          method:"PATCH",
+          auth:true,
+          body:JSON.stringify({
+
+            enabled:
+              el(
+                "pe" + position
+              ).checked,
+
+            title:
+              el(
+                "pt" + position
+              ).value.trim()
+              ||
+              (
+                "Premio " +
+                position
+              ),
+
+            description:
+              el(
+                "pd" + position
+              ).value.trim()
+              || null,
+
+            image_url:
+              imageUrl,
+
+            updated_at:
+              new Date()
+              .toISOString()
+
+          })
+        }
+      );
+
+    }
+
+    alert(
+      "Premios guardados."
+    );
+
+    await loadPublicData();
+    await loadAdmin();
+
+  }
+  catch (error) {
+
+    alert(error.message);
+
+  }
+
+}
+
+async function publishWinners() {
+
+  try {
+
+    const values = [
+      el("win1").value,
+      el("win2").value,
+      el("win3").value
+    ];
+
+    const winners =
+      values
+      .map(
+        (value,index) => {
+
+          if (value === "") {
+            return null;
+          }
+
+          return {
+
+            position:
+              index + 1,
+
+            winning_number:
+              Number(value),
+
+            published:
+              true,
+
+            published_at:
+              new Date()
+              .toISOString()
+
+          };
+
+        }
+      )
+      .filter(Boolean);
+
+    if (!winners.length) {
+
+      throw new Error(
+        "Introduce al menos el primer número ganador."
+      );
+
+    }
+
+    for (
+      const winner
+      of winners
+    ) {
+
+      if (
+        winner.winning_number < 0 ||
+        winner.winning_number > 99
+      ) {
+
+        throw new Error(
+          "El número ganador debe estar entre 00 y 99."
+        );
+
+      }
+
+    }
+
+    await api(
+      "/rest/v1/raffle_winners?position=gte.1",
+      {
+        method:"DELETE",
+        auth:true
+      }
+    );
+
+    await api(
+      "/rest/v1/raffle_winners",
+      {
+        method:"POST",
+        auth:true,
+        headers:{
+          "Prefer":
+            "return=minimal"
+        },
+        body:
+          JSON.stringify(
+            winners
+          )
+      }
+    );
+
+    alert(
+      "Ganadores publicados."
+    );
+
+    await loadPublicData();
+
+  }
+  catch (error) {
+
+    alert(error.message);
+
+  }
+
+}
+
+loadPublicData();
+
+</script>
+
+</body>
+</html>
