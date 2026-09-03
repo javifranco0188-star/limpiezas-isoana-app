@@ -2,6 +2,12 @@ name: Construir APK Sorteo Oviedo
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "sorteo-android/**"
+      - ".github/workflows/build-sorteo-apk.yml"
 
 jobs:
   apk:
@@ -32,14 +38,25 @@ jobs:
         run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
 
       - name: Construir APK
-        run: gradle :app:assembleDebug
+        run: gradle :app:assembleDebug --no-daemon
 
-      - name: Preparar archivo final
-        run: cp app/build/outputs/apk/debug/app-debug.apk Sorteo-Oviedo.apk
+      - name: Preparar y verificar APK
+        run: |
+          set -e
+          APK="app/build/outputs/apk/debug/app-debug.apk"
+          test -f "$APK"
+          cp "$APK" Sorteo-Oviedo.apk
+          echo "APK generada:"
+          ls -lh Sorteo-Oviedo.apk
+          file Sorteo-Oviedo.apk
+          sha256sum Sorteo-Oviedo.apk
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose Sorteo-Oviedo.apk
 
       - name: Subir APK
         uses: actions/upload-artifact@v4
         with:
           name: Sorteo-Oviedo-APK
           path: sorteo-android/Sorteo-Oviedo.apk
+          if-no-files-found: error
+          compression-level: 0
           retention-days: 30
