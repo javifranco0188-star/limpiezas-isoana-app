@@ -73,7 +73,7 @@
         </div>
         <button class="pillBtn" onclick="openAdmin()">Administrar</button>
       </div>
-      <div class="coverPhoto"><img src="./portada-premio.jpg?v=3" alt="Set artesanal kit en cuero y plata"></div>
+      <div class="coverPhoto"><img src="./portada-premio.jpg?v=4" alt="Set artesanal kit en cuero y plata"></div>
       <div class="heroCard">
         <p class="heroTitle">Sorteo del 12/10/2026</p>
         <p class="heroText" id="reference">Resultado vinculado a los dos últimos números del sorteo extraordinario de la Lotería Nacional del 12/10/2026.</p>
@@ -246,7 +246,7 @@ function renderPublic(){
   $("numbers").innerHTML=DATA.numbers.map(n=>'<button class="num '+clean(n.status)+(selectedNumber===n.number?' selected':'')+'" '+(n.status!=="free"?'disabled':'')+' onclick="pick('+n.number+')">'+fmt(n.number)+'</button>').join("");
   const active=DATA.prizes.filter(p=>p.enabled);
   $("prizes").innerHTML=active.length?active.map(p=>{
-    const img=p.position===1?"./portada-premio.jpg?v=3":(p.image_url||p.image_url_2);
+    const img=p.position===1?"./portada-premio.jpg?v=4":(p.image_url||p.image_url_2);
     return '<div class="prizeCard">'+
       '<div class="prizeMedia">'+(img?'<img src="'+clean(img)+'" alt="Imagen del premio">':'Set artesanal kit en cuero y plata · Paraguay Asturias')+'</div>'+
       '<div class="prizeBody"><b>'+p.position+'.º premio · '+clean(p.title)+'</b>'+(p.description?'<p>'+clean(p.description)+'</p>':'')+'</div>'+
@@ -377,7 +377,7 @@ async function toggleAdmin(email,active){
 
 window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;$("installBtn").style.display="block"});
 async function installApp(){if(!deferredPrompt){alert("En Android: abre el menú del navegador y pulsa “Instalar aplicación” o “Añadir a pantalla de inicio”.");return}deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;$("installBtn").style.display="none"}
-if("serviceWorker" in navigator)navigator.serviceWorker.register("./sw.js?v=3").then(r=>r.update()).catch(()=>{});
+if("serviceWorker" in navigator)navigator.serviceWorker.register("./sw.js?v=4").then(r=>r.update()).catch(()=>{});
 loadPublic();
 </script>
 </body>
