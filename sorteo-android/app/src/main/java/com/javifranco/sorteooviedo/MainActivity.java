@@ -16,7 +16,7 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
     private static final int FILE_CHOOSER_REQUEST = 1001;
     private static final String APP_URL =
-            "https://limpiezasisoana-ux.github.io/app-sorteo/";
+            "https://javifranco0188-star.github.io/limpiezas-isoana-app/";
 
     private WebView webView;
     private ValueCallback<Uri[]> fileCallback;
