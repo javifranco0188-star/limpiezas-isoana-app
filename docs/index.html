@@ -267,7 +267,6 @@ async function reserveNumber(){
   if(selectedNumber===null)return msg("reserveMsg","Selecciona primero un número.","err");
   if(!$("adult").checked)return msg("reserveMsg","Debes confirmar que eres mayor de 18 años.","err");
   const name=$("name").value.trim(),phone=$("phone").value.trim(),email=$("email").value.trim();
-  if(name.length<7 && phone.length<7)return msg("reserveMsg","Introduce tus datos correctamente.","err");
   if(name.length<2)return msg("reserveMsg","Introduce tu nombre.","err");
   if(phone.length<7)return msg("reserveMsg","Introduce un teléfono válido.","err");
   const chosen=selectedNumber;
