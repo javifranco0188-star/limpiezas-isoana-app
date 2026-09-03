@@ -1,0 +1,45 @@
+name: Construir APK Sorteo Oviedo
+
+on:
+  workflow_dispatch:
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sorteo-android
+
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Configurar Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.13"
+
+      - name: Configurar Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Instalar SDK 36
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Construir APK
+        run: gradle :app:assembleDebug
+
+      - name: Preparar archivo final
+        run: cp app/build/outputs/apk/debug/app-debug.apk Sorteo-Oviedo.apk
+
+      - name: Subir APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Sorteo-Oviedo-APK
+          path: sorteo-android/Sorteo-Oviedo.apk
+          retention-days: 30
