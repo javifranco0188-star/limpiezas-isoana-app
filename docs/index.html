@@ -2,1448 +2,382 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#111827">
-  <title>Sorteo</title>
-
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#5b1f13">
+  <meta name="description" content="Sorteo en Oviedo, Asturias. Reserva de números 00 a 99.">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <title>Sorteo · Oviedo</title>
   <style>
     :root{
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
-      color:#172033;
-      background:#f4f6fa
+      --wine:#5b1f13;--wine2:#7a2e1e;--gold:#c99a3d;--cream:#fff9f0;
+      --ink:#2c241f;--muted:#75685e;--line:#eadfce;--green:#dff5e7;
+      --greenInk:#17653a;--amber:#fff0c7;--amberInk:#7a5310;--red:#ffe0e0;
+      --redInk:#922c2c;--white:#fff;
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
     }
-    *{box-sizing:border-box}
-    body{margin:0}
-    header{
-      background:#111827;
-      color:#fff;
-      padding:18px 14px;
-      position:sticky;
-      top:0;
-      z-index:5
-    }
-    .wrap{max-width:1000px;margin:auto}
-    h1{margin:0;font-size:24px}
-    h2{margin-top:5px}
-    .sub{opacity:.8;font-size:13px}
-    .card{
-      background:#fff;
-      border-radius:18px;
-      padding:16px;
-      margin:14px 0;
-      box-shadow:0 5px 20px #0000000d
-    }
-    .row{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px
-    }
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(10,1fr);
-      gap:7px
-    }
-    .num{
-      border:0;
-      border-radius:11px;
-      padding:13px 3px;
-      font-weight:800;
-      cursor:pointer
-    }
-    .free{background:#e8f8ee;color:#176b36}
-    .reserved{background:#fff3d4;color:#8a5a00}
-    .sold{background:#ffe4e6;color:#9f1239}
-    .sel{outline:3px solid #111827}
-
-    button,.btn{
-      display:inline-block;
-      border:0;
-      border-radius:11px;
-      padding:11px 14px;
-      font-weight:750;
-      cursor:pointer;
-      text-decoration:none
-    }
-
-    .primary{background:#111827;color:#fff}
-    .wa{background:#20c65a;color:#fff}
-    .muted{background:#e5e7eb;color:#111827}
-    .danger{background:#be123c;color:#fff}
-
-    input,textarea,select{
-      width:100%;
-      padding:11px;
-      border:1px solid #d1d5db;
-      border-radius:10px;
-      margin:5px 0 10px;
-      background:#fff
-    }
-
-    .badge{
-      display:inline-block;
-      padding:5px 9px;
-      border-radius:999px;
-      font-size:12px;
-      font-weight:800
-    }
-
-    .bfree{background:#e8f8ee}
-    .bres{background:#fff3d4}
-    .bsold{background:#ffe4e6}
-
+    *{box-sizing:border-box} body{margin:0;background:linear-gradient(180deg,#fffaf4,#f8f1e7);color:var(--ink)}
+    button,input,textarea{font:inherit} button{cursor:pointer}
+    .shell{max-width:1080px;margin:auto;padding:0 14px 110px}
+    .hero{margin:0 -14px 20px;padding:20px 16px 26px;background:
+      radial-gradient(circle at 85% 0,#b97636 0,transparent 34%),
+      linear-gradient(135deg,#4b160e,#7f2d1c);color:white;box-shadow:0 10px 32px #51201738}
+    .heroInner{max-width:1080px;margin:auto}
+    .topbar{display:flex;align-items:center;gap:10px}
+    .brand{flex:1}.brand h1{margin:0;font-size:30px;letter-spacing:.2px}
+    .brand p{margin:3px 0 0;opacity:.9}
+    .pillBtn,.btn{border:0;border-radius:13px;padding:11px 14px;font-weight:800}
+    .pillBtn{background:#ffffff18;color:#fff;border:1px solid #ffffff33}
+    .heroCard{margin-top:18px;background:#ffffff12;border:1px solid #ffffff28;border-radius:20px;padding:16px}
+    .heroTitle{font-size:19px;font-weight:900;margin:0 0 5px}.heroText{line-height:1.5;margin:0;color:#fff7ef}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:15px}
+    .stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:13px;text-align:center}
+    .stat b{display:block;font-size:22px;color:var(--wine)} .stat span{font-size:12px;color:var(--muted)}
+    .card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:17px;margin:14px 0;box-shadow:0 8px 24px #63482912}
+    h2{font-size:21px;margin:0 0 12px;color:var(--wine)} h3{margin:18px 0 9px;color:var(--wine)}
+    .legend{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 14px}
+    .badge{border-radius:999px;padding:6px 10px;font-size:12px;font-weight:800}
+    .freeB{background:var(--green);color:var(--greenInk)} .resB{background:var(--amber);color:var(--amberInk)} .soldB{background:var(--red);color:var(--redInk)}
+    .grid{display:grid;grid-template-columns:repeat(10,1fr);gap:7px}
+    .num{border:0;border-radius:12px;padding:12px 2px;font-weight:900;min-height:44px}
+    .free{background:var(--green);color:var(--greenInk)} .reserved{background:var(--amber);color:var(--amberInk)} .sold{background:var(--red);color:var(--redInk)}
+    .num.selected{outline:3px solid var(--wine);transform:translateY(-1px)}
+    .num:disabled{opacity:.78;cursor:not-allowed}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+    label{display:block;font-size:13px;font-weight:800;color:#5d5047}
+    input,textarea{width:100%;margin:6px 0 11px;padding:12px;border:1px solid #d9ccbc;border-radius:12px;background:#fff}
+    textarea{min-height:88px;resize:vertical}
+    .btn{background:var(--wine);color:#fff}.btn.alt{background:#eee4d8;color:var(--wine)}
+    .btn.whatsapp{background:#1ea652}.btn.danger{background:#a92b2b}.btn.gold{background:var(--gold);color:#241a10}
+    .actions{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+    .message{margin-top:10px;font-weight:700}.ok{color:#17653a}.err{color:#a02727}.muted{color:var(--muted);font-size:13px}
+    .prizeCard{overflow:hidden;border-radius:18px;border:1px solid var(--line);background:#fffaf4;margin:10px 0}
+    .prizeMedia{min-height:140px;background:linear-gradient(135deg,#ead6b2,#fff8eb);display:flex;align-items:center;justify-content:center;color:#7f5c28;font-weight:900;text-align:center;padding:20px}
+    .prizeMedia img{width:100%;height:auto;display:block;max-height:440px;object-fit:cover}
+    .prizeBody{padding:15px}.prizeBody b{color:var(--wine);font-size:18px}
+    .install{position:fixed;left:14px;right:14px;bottom:14px;z-index:20;max-width:600px;margin:auto;display:none;box-shadow:0 12px 30px #0003}
     .hidden{display:none!important}
-
-    .top{
-      display:flex;
-      gap:8px;
-      align-items:center
-    }
-
-    .notice{
-      padding:10px 12px;
-      border-radius:10px;
-      background:#eef2ff;
-      margin:10px 0
-    }
-
-    .prizeimg{
-      max-width:100%;
-      max-height:280px;
-      border-radius:14px;
-      display:block;
-      margin:10px 0
-    }
-
-    table{
-      width:100%;
-      border-collapse:collapse;
-      font-size:14px
-    }
-
-    td,th{
-      padding:8px;
-      border-bottom:1px solid #e5e7eb;
-      text-align:left
-    }
-
-    .small{
-      font-size:12px;
-      color:#667085
-    }
-
-    .ok{
-      color:#176b36;
-      font-weight:700;
-      margin-top:10px
-    }
-
-    .error{
-      color:#be123c;
-      font-weight:700;
-      margin-top:10px
-    }
-
-    @media(max-width:700px){
-      .row{grid-template-columns:1fr}
-      .grid{grid-template-columns:repeat(5,1fr)}
-    }
+    .adminBox{border:2px solid #e4cda7}.adminHead{display:flex;align-items:center;gap:9px}.adminHead h2{flex:1;margin:0}
+    table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px 7px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+    .scroll{overflow:auto}.ownerTag{display:inline-block;padding:4px 7px;border-radius:999px;background:#f5dfaa;color:#69460b;font-size:11px;font-weight:900}
+    .mini{padding:7px 9px;border-radius:9px;border:0;font-weight:800;background:#eee4d8;color:var(--wine)}
+    @media(max-width:760px){.grid{grid-template-columns:repeat(5,1fr)}.row{grid-template-columns:1fr}.brand h1{font-size:25px}.stats{gap:7px}.stat{padding:10px 6px}}
   </style>
 </head>
-
 <body>
-
-<header>
-  <div class="wrap">
-    <div class="top">
-      <div style="flex:1">
-        <h1 id="title">Sorteo</h1>
-        <div class="sub" id="subtitle">Oviedo, Asturias</div>
+  <div class="hero">
+    <div class="heroInner">
+      <div class="topbar">
+        <div class="brand">
+          <h1 id="title">Sorteo</h1>
+          <p id="location">Oviedo, Asturias</p>
+        </div>
+        <button class="pillBtn" onclick="openAdmin()">Administrar</button>
       </div>
-
-      <button class="muted" onclick="showAdmin()">
-        Administrar
-      </button>
+      <div class="heroCard">
+        <p class="heroTitle">Sorteo del 12/10/2026</p>
+        <p class="heroText" id="reference">Resultado vinculado a los dos últimos números del sorteo extraordinario de la Lotería Nacional del 12/10/2026.</p>
+      </div>
     </div>
   </div>
-</header>
 
-<main class="wrap" style="padding:8px 14px 40px">
+  <main class="shell">
+    <section class="stats">
+      <div class="stat"><b id="freeCount">—</b><span>Libres</span></div>
+      <div class="stat"><b id="reservedCount">—</b><span>Reservados</span></div>
+      <div class="stat"><b id="soldCount">—</b><span>Comprados</span></div>
+    </section>
 
-  <section class="card">
-    <div class="row">
-      <div>
-        <b>Estado de números</b>
-        <p>
-          <span class="badge bfree">Libre</span>
-          <span class="badge bres">Reservado</span>
-          <span class="badge bsold">Comprado</span>
-        </p>
+    <section class="card">
+      <h2>Elige tu número</h2>
+      <div class="legend">
+        <span class="badge freeB">Libre</span>
+        <span class="badge resB">Reservado</span>
+        <span class="badge soldB">Comprado</span>
       </div>
+      <div id="numbers" class="grid"></div>
+    </section>
 
-      <div>
-        <b>Fecha del sorteo</b>
-        <p id="drawDate">—</p>
-      </div>
-    </div>
-
-    <div class="notice" id="ref"></div>
-  </section>
-
-  <section class="card">
-    <h2>Números</h2>
-    <div id="numbers" class="grid"></div>
-  </section>
-
-  <section class="card">
-    <h2>Reservar número</h2>
-
-    <p id="picked">
-      Selecciona un número libre.
-    </p>
-
-    <div class="row">
-
-      <label>
-        Nombre
-        <input id="name" autocomplete="name">
-      </label>
-
-      <label>
-        Teléfono
-        <input id="phone" inputmode="tel" autocomplete="tel">
-      </label>
-
-    </div>
-
-    <label>
-      Email
-      <input id="email" type="email" autocomplete="email">
-    </label>
-
-    <label style="display:flex;align-items:center;gap:8px">
-      <input
-        id="adult"
-        type="checkbox"
-        style="width:auto;margin:0"
-      >
-      Confirmo que soy mayor de 18 años
-    </label>
-
-    <br>
-
-    <button class="primary" onclick="reserveNumber()">
-      Reservar
-    </button>
-
-    <a
-      id="whatsapp"
-      class="btn wa hidden"
-      target="_blank"
-      rel="noopener"
-    >
-      Continuar por WhatsApp
-    </a>
-
-    <div id="msg"></div>
-  </section>
-
-  <section class="card">
-    <h2>Premios</h2>
-    <div id="prizes"></div>
-  </section>
-
-  <section class="card">
-    <h2>Ganadores</h2>
-    <div id="winners">
-      Aún no publicados.
-    </div>
-  </section>
-
-  <section id="admin" class="card hidden">
-
-    <h2>Panel administrativo</h2>
-
-    <div id="loginBox">
-
-      <label>
-        Email
-        <input
-          id="adminEmail"
-          placeholder="Email del administrador"
-          type="email"
-        >
-      </label>
-
-      <label>
-        Contraseña
-        <input
-          id="adminPass"
-          type="password"
-        >
-      </label>
-
-      <button class="primary" onclick="login()">
-        Entrar
-      </button>
-
-      <div id="loginMsg"></div>
-
-    </div>
-
-    <div id="adminBox" class="hidden">
-
-      <h3>Configuración</h3>
-
+    <section class="card">
+      <h2>Reservar</h2>
+      <p id="picked" class="muted">Selecciona primero un número libre.</p>
       <div class="row">
-
-        <label>
-          WhatsApp
-          <input
-            id="setWa"
-            placeholder="346XXXXXXXX"
-          >
-        </label>
-
-        <label>
-          Precio por número (€)
-          <input
-            id="setPrice"
-            type="number"
-            step="0.01"
-          >
-        </label>
-
+        <label>Nombre<input id="name" autocomplete="name"></label>
+        <label>Teléfono<input id="phone" inputmode="tel" autocomplete="tel"></label>
       </div>
-
-      <label>
-        Referencia del sorteo
-        <textarea id="setRef"></textarea>
+      <label>Email<input id="email" type="email" autocomplete="email"></label>
+      <label style="display:flex;gap:8px;align-items:center;font-weight:700">
+        <input id="adult" type="checkbox" style="width:auto;margin:0"> Confirmo que soy mayor de 18 años
       </label>
+      <div class="actions" style="margin-top:13px">
+        <button class="btn" onclick="reserveNumber()">Reservar número</button>
+        <a id="whatsapp" class="btn whatsapp hidden" target="_blank" rel="noopener">Continuar por WhatsApp</a>
+      </div>
+      <div id="reserveMsg" class="message"></div>
+    </section>
 
-      <button
-        class="primary"
-        onclick="saveSettings()"
-      >
-        Guardar configuración
-      </button>
+    <section class="card">
+      <h2>Premio</h2>
+      <div id="prizes"></div>
+    </section>
 
-      <h3>Reservas y compras</h3>
+    <section class="card">
+      <h2>Ganadores</h2>
+      <div id="winners" class="muted">Aún no publicados.</div>
+    </section>
 
-      <div style="overflow:auto">
-
-        <table>
-
-          <thead>
-            <tr>
-              <th>Nº</th>
-              <th>Nombre</th>
-              <th>Teléfono</th>
-              <th>Estado</th>
-              <th>Acción</th>
-            </tr>
-          </thead>
-
-          <tbody id="orders"></tbody>
-
-        </table>
-
+    <section id="admin" class="card adminBox hidden">
+      <div class="adminHead">
+        <h2>Panel administrativo</h2>
+        <button class="mini" onclick="closeAdmin()">Cerrar</button>
       </div>
 
-      <h3>Premios</h3>
-
-      <div id="adminPrizes"></div>
-
-      <button
-        class="primary"
-        onclick="savePrizes()"
-      >
-        Guardar premios
-      </button>
-
-      <h3>Publicar ganadores</h3>
-
-      <div class="row">
-
-        <input
-          id="win1"
-          type="number"
-          min="0"
-          max="99"
-          placeholder="1º número"
-        >
-
-        <input
-          id="win2"
-          type="number"
-          min="0"
-          max="99"
-          placeholder="2º premio opcional"
-        >
-
+      <div id="loginBox">
+        <p class="muted">El administrador principal es <b>javifranco0188@gmail.com</b>. Solo él puede autorizar a otros administradores.</p>
+        <label>Email<input id="adminEmail" type="email" value="javifranco0188@gmail.com"></label>
+        <label>Contraseña<input id="adminPass" type="password" autocomplete="current-password"></label>
+        <div class="actions">
+          <button class="btn" onclick="login()">Entrar</button>
+          <button class="btn gold" onclick="createAccount()">Crear mi acceso principal</button>
+          <button class="btn alt" onclick="registerPending()">Registrar cuenta para solicitar acceso</button>
+        </div>
+        <div id="loginMsg" class="message"></div>
+        <p class="muted">Si es tu primera vez, pulsa “Crear mi acceso principal”, usa tu correo principal y elige una contraseña. Si Supabase te pide confirmar el correo, abre el email recibido y vuelve a entrar.</p>
       </div>
 
-      <input
-        id="win3"
-        type="number"
-        min="0"
-        max="99"
-        placeholder="3º premio opcional"
-      >
+      <div id="adminPanel" class="hidden">
+        <div class="actions">
+          <span id="adminIdentity" class="ownerTag"></span>
+          <button class="mini" onclick="logout()">Salir</button>
+        </div>
 
-      <button
-        class="primary"
-        onclick="publishWinners()"
-      >
-        Publicar ganadores
-      </button>
+        <h3>Configuración del sorteo</h3>
+        <div class="row">
+          <label>WhatsApp<input id="setWa" placeholder="346XXXXXXXX"></label>
+          <label>Precio por número (€)<input id="setPrice" type="number" step="0.01"></label>
+        </div>
+        <label>Referencia<textarea id="setRef"></textarea></label>
+        <button class="btn" onclick="saveSettings()">Guardar configuración</button>
+        <div id="settingsMsg" class="message"></div>
 
-      <p class="small">
-        Solo el administrador autorizado puede modificar el sorteo.
-      </p>
+        <h3>Reservas y compras</h3>
+        <div class="scroll">
+          <table>
+            <thead><tr><th>Nº</th><th>Nombre</th><th>Teléfono</th><th>Estado</th><th>Acción</th></tr></thead>
+            <tbody id="orders"></tbody>
+          </table>
+        </div>
 
-    </div>
+        <h3>Premios</h3>
+        <div id="adminPrizes"></div>
+        <button class="btn" onclick="savePrizes()">Guardar premios</button>
+        <div id="prizeMsg" class="message"></div>
 
-  </section>
+        <h3>Publicar ganadores</h3>
+        <div class="row">
+          <input id="win1" type="number" min="0" max="99" placeholder="1.º número">
+          <input id="win2" type="number" min="0" max="99" placeholder="2.º premio opcional">
+        </div>
+        <input id="win3" type="number" min="0" max="99" placeholder="3.º premio opcional">
+        <button class="btn" onclick="publishWinners()">Publicar ganadores</button>
 
-</main>
+        <div id="ownerOnly" class="hidden">
+          <h3>Administradores autorizados</h3>
+          <p class="muted">Solo el administrador principal puede activar o quitar permisos. La otra persona debe registrarse primero con su correo desde este mismo enlace.</p>
+          <div class="row">
+            <label>Correo a autorizar<input id="newAdminEmail" type="email" placeholder="correo@ejemplo.com"></label>
+            <div style="display:flex;align-items:end"><button class="btn" style="margin-bottom:11px" onclick="setAdminByEmail(true)">Autorizar administrador</button></div>
+          </div>
+          <div class="scroll">
+            <table>
+              <thead><tr><th>Correo</th><th>Tipo</th><th>Estado</th><th>Acción</th></tr></thead>
+              <tbody id="adminsList"></tbody>
+            </table>
+          </div>
+          <div id="adminsMsg" class="message"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <button id="installBtn" class="btn install" onclick="installApp()">Instalar esta app en el móvil</button>
 
 <script>
+const SUPABASE_URL="https://jqmcpricmwzggleupxwp.supabase.co";
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxbWNwcmljbXd6Z2dsZXVweHdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwMDQzMjUsImV4cCI6MjEwMzU4MDMyNX0.-hAGr-rGNQyWzqqn93bMa4F6azwkgelxwTs_W4qAoy0";
+const PRIMARY_EMAIL="javifranco0188@gmail.com";
+let DATA=null, selectedNumber=null, token=localStorage.getItem("raffle_token")||"", currentUser=null, deferredPrompt=null;
 
-const SUPABASE_URL =
-"https://jqmcpricmwzggleupxwp.supabase.co";
-
-const SUPABASE_KEY =
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxbWNwcmljbXd6Z2dsZXVweHdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwMDQzMjUsImV4cCI6MjEwMzU4MDMyNX0.-hAGr-rGNQyWzqqn93bMa4F6azwkgelxwTs_W4qAoy0";
-
-let DATA = null;
-let selectedNumber = null;
-
-let adminToken =
-localStorage.getItem("raffle_token") || "";
-
-const el = id =>
-document.getElementById(id);
-
-function headers(auth = false) {
-
-  const result = {
-    "apikey": SUPABASE_KEY,
-    "Authorization": "Bearer " + (auth && adminToken ? adminToken : SUPABASE_KEY),
-    "Content-Type": "application/json"
-  };
-
-  return result;
+const $=id=>document.getElementById(id);
+const clean=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt=n=>String(n).padStart(2,"0");
+function authHeaders(useToken=false){return {
+  apikey:SUPABASE_KEY,
+  Authorization:"Bearer "+(useToken&&token?token:SUPABASE_KEY),
+  "Content-Type":"application/json"
+}}
+async function api(path,opts={}){
+  const res=await fetch(SUPABASE_URL+path,{...opts,headers:{...authHeaders(opts.auth===true),...(opts.headers||{})}});
+  const txt=await res.text(); let out=null;
+  if(txt){try{out=JSON.parse(txt)}catch{out=txt}}
+  if(!res.ok) throw new Error(out?.message||out?.error_description||out?.hint||out?.msg||"Ha ocurrido un error");
+  return out;
 }
+function msg(id,text,type="ok"){const e=$(id);e.textContent=text;e.className="message "+(type==="err"?"err":"ok")}
 
-async function api(path, options = {}) {
-
-  const response =
-    await fetch(
-      SUPABASE_URL + path,
-      {
-        ...options,
-        headers: {
-          ...headers(options.auth === true),
-          ...(options.headers || {})
-        }
-      }
-    );
-
-  const text =
-    await response.text();
-
-  let data = null;
-
-  if (text) {
-    try {
-      data = JSON.parse(text);
-    }
-    catch {
-      data = text;
-    }
-  }
-
-  if (!response.ok) {
-
-    throw new Error(
-      data?.message ||
-      data?.error_description ||
-      data?.hint ||
-      "Ha ocurrido un error"
-    );
-
-  }
-
-  return data;
-}
-
-function escapeHtml(value) {
-
-  return String(value ?? "")
-    .replace(
-      /[&<>"']/g,
-      character => ({
-        "&":"&amp;",
-        "<":"&lt;",
-        ">":"&gt;",
-        '"':"&quot;",
-        "'":"&#39;"
-      }[character])
-    );
-
-}
-
-function formatNumber(number) {
-
-  return String(number)
-    .padStart(2,"0");
-
-}
-
-async function loadPublicData() {
-
-  try {
-
-    const [
-      settings,
-      numbers,
-      prizes,
-      winners
-    ] =
-    await Promise.all([
-
-      api(
-        "/rest/v1/raffle_settings?select=*&limit=1"
-      ),
-
-      api(
-        "/rest/v1/raffle_numbers?select=number,status&order=number"
-      ),
-
-      api(
-        "/rest/v1/raffle_prizes?select=*&order=position"
-      ),
-
-      api(
-        "/rest/v1/raffle_winners?select=*&published=eq.true&order=position"
-      )
-
+async function loadPublic(){
+  try{
+    const [settings,numbers,prizes,winners]=await Promise.all([
+      api("/rest/v1/raffle_settings?select=*&limit=1"),
+      api("/rest/v1/raffle_numbers?select=number,status&order=number"),
+      api("/rest/v1/raffle_prizes?select=*&order=position"),
+      api("/rest/v1/raffle_winners?select=*&published=eq.true&order=position")
     ]);
-
-    DATA = {
-      settings: settings[0],
-      numbers,
-      prizes,
-      winners
-    };
-
-    renderPublic();
-
-  }
-  catch (error) {
-
-    console.error(error);
-
-    el("numbers").innerHTML =
-      "<p class='error'>No se pudieron cargar los números. Vuelve a intentarlo en unos segundos.</p>";
-    el("prizes").innerHTML =
-      "<p class='error'>No se pudieron cargar los premios.</p>";
-
-  }
-
+    DATA={settings:settings[0]||{},numbers,prizes,winners}; renderPublic();
+  }catch(e){$("numbers").innerHTML='<div class="err">No se pudieron cargar los números. '+clean(e.message)+'</div>'}
+}
+function renderPublic(){
+  const s=DATA.settings||{};
+  $("title").textContent=s.title||"Sorteo";
+  $("location").textContent=s.location||"Oviedo, Asturias";
+  $("reference").textContent=s.draw_reference||"Resultado vinculado a los dos últimos números del sorteo extraordinario de la Lotería Nacional del 12/10/2026.";
+  const counts={free:0,reserved:0,sold:0}; DATA.numbers.forEach(n=>{counts[n.status]=(counts[n.status]||0)+1});
+  $("freeCount").textContent=counts.free||0;$("reservedCount").textContent=counts.reserved||0;$("soldCount").textContent=counts.sold||0;
+  $("numbers").innerHTML=DATA.numbers.map(n=>'<button class="num '+clean(n.status)+(selectedNumber===n.number?' selected':'')+'" '+(n.status!=="free"?'disabled':'')+' onclick="pick('+n.number+')">'+fmt(n.number)+'</button>').join("");
+  const active=DATA.prizes.filter(p=>p.enabled);
+  $("prizes").innerHTML=active.length?active.map(p=>{
+    const img=p.image_url||p.image_url_2;
+    return '<div class="prizeCard">'+
+      '<div class="prizeMedia">'+(img?'<img src="'+clean(img)+'" alt="Imagen del premio">':'Set artesanal kit en cuero y plata · Paraguay Asturias')+'</div>'+
+      '<div class="prizeBody"><b>'+p.position+'.º premio · '+clean(p.title)+'</b>'+(p.description?'<p>'+clean(p.description)+'</p>':'')+'</div>'+
+    '</div>';
+  }).join(""):'<p class="muted">Premio pendiente de configurar.</p>';
+  $("winners").innerHTML=DATA.winners.length?DATA.winners.map(w=>'<p><b>'+w.position+'.º premio:</b> número '+fmt(w.winning_number)+'</p>').join(""):'Aún no publicados.';
+}
+function pick(n){selectedNumber=n;$("picked").textContent="Número seleccionado: "+fmt(n);renderPublic()}
+async function reserveNumber(){
+  $("whatsapp").classList.add("hidden");$("reserveMsg").textContent="";
+  if(selectedNumber===null)return msg("reserveMsg","Selecciona primero un número.","err");
+  if(!$("adult").checked)return msg("reserveMsg","Debes confirmar que eres mayor de 18 años.","err");
+  const name=$("name").value.trim(),phone=$("phone").value.trim(),email=$("email").value.trim();
+  if(name.length<2)return msg("reserveMsg","Introduce tu nombre.","err");
+  if(phone.length<7)return msg("reserveMsg","Introduce un teléfono válido.","err");
+  const chosen=selectedNumber;
+  try{
+    await api("/rest/v1/rpc/reserve_raffle_number",{method:"POST",body:JSON.stringify({p_number:chosen,p_name:name,p_phone:phone,p_email:email||null})});
+    msg("reserveMsg","Reserva registrada. El administrador confirmará la compra.");
+    const wa=DATA.settings?.whatsapp_phone;
+    if(wa){$("whatsapp").href="https://wa.me/"+String(wa).replace(/\D/g,"")+"?text="+encodeURIComponent("Hola, he reservado el número "+fmt(chosen)+" para el sorteo. Nombre: "+name);$("whatsapp").classList.remove("hidden")}
+    selectedNumber=null;await loadPublic();
+  }catch(e){msg("reserveMsg",e.message,"err");await loadPublic()}
 }
 
-function renderPublic() {
-
-  const settings =
-    DATA.settings || {};
-
-  el("title").textContent =
-    settings.title || "Sorteo";
-
-  el("subtitle").textContent =
-    settings.location ||
-    "Oviedo, Asturias";
-
-  el("drawDate").textContent =
-    settings.draw_date
-      ? settings.draw_date.split("-").reverse().join("/")
-      : "—";
-
-  el("ref").textContent =
-    settings.draw_reference || "";
-
-  el("numbers").innerHTML =
-    DATA.numbers
-    .map(number => {
-
-      const selected =
-        selectedNumber === number.number
-        ? " sel"
-        : "";
-
-      const disabled =
-        number.status !== "free"
-        ? " disabled"
-        : "";
-
-      return `
-        <button
-          class="num ${number.status}${selected}"
-          ${disabled}
-          onclick="pickNumber(${number.number})"
-        >
-          ${formatNumber(number.number)}
-        </button>
-      `;
-
-    })
-    .join("");
-
-  const activePrizes =
-    DATA.prizes
-    .filter(prize => prize.enabled);
-
-  el("prizes").innerHTML =
-    activePrizes.length
-    ? activePrizes.map(prize => {
-
-        return `
-          <div class="card">
-
-            <b>
-              ${prize.position}º premio:
-            </b>
-
-            ${escapeHtml(prize.title)}
-
-            ${
-              prize.description
-              ? `<p>${escapeHtml(prize.description)}</p>`
-              : ""
-            }
-
-            ${
-              prize.image_url
-              ? `<img
-                   class="prizeimg"
-                   src="${escapeHtml(prize.image_url)}"
-                   alt="Premio"
-                 >`
-              : ""
-            }
-
-          </div>
-        `;
-
-      }).join("")
-    : "Sin premios configurados.";
-
-  el("winners").innerHTML =
-    DATA.winners.length
-    ? DATA.winners
-      .map(winner => `
-        <p>
-          <b>${winner.position}º premio:</b>
-          número
-          ${formatNumber(winner.winning_number)}
-        </p>
-      `)
-      .join("")
-    : "Aún no publicados.";
-
+function openAdmin(){$("admin").classList.remove("hidden");$("admin").scrollIntoView({behavior:"smooth"});if(token)loadAdmin().catch(()=>{})}
+function closeAdmin(){$("admin").classList.add("hidden")}
+async function signAuth(path,email,password){
+  const res=await fetch(SUPABASE_URL+path,{method:"POST",headers:authHeaders(false),body:JSON.stringify({email,password})});
+  const out=await res.json(); if(!res.ok)throw new Error(out.error_description||out.msg||out.message||"No se pudo completar el acceso"); return out;
 }
-
-function pickNumber(number) {
-
-  selectedNumber = number;
-
-  el("picked").textContent =
-    "Número seleccionado: " +
-    formatNumber(number);
-
-  renderPublic();
-
+async function login(){
+  try{
+    const email=$("adminEmail").value.trim(),pass=$("adminPass").value;
+    const out=await signAuth("/auth/v1/token?grant_type=password",email,pass);
+    token=out.access_token;currentUser=out.user;localStorage.setItem("raffle_token",token);
+    const admin=await api("/rest/v1/raffle_admins?select=active,is_owner&user_id=eq."+out.user.id,{auth:true});
+    if(!admin.length||!admin[0].active){logout(false);throw new Error("Esta cuenta todavía no está autorizada como administrador.")}
+    msg("loginMsg","Acceso correcto.");await loadAdmin();
+  }catch(e){msg("loginMsg",e.message,"err")}
 }
-
-async function reserveNumber() {
-
-  const message = el("msg");
-
-  message.className = "";
-  message.textContent = "";
-
-  el("whatsapp")
-    .classList.add("hidden");
-
-  if (selectedNumber === null) {
-
-    message.className = "error";
-
-    message.textContent =
-      "Selecciona primero un número.";
-
-    return;
-  }
-
-  if (!el("adult").checked) {
-
-    message.className = "error";
-
-    message.textContent =
-      "Debes confirmar que eres mayor de 18 años.";
-
-    return;
-  }
-
-  const name =
-    el("name").value.trim();
-
-  const phone =
-    el("phone").value.trim();
-
-  const email =
-    el("email").value.trim();
-
-  if (name.length < 2) {
-
-    message.className = "error";
-    message.textContent =
-      "Introduce tu nombre.";
-
-    return;
-  }
-
-  if (phone.length < 7) {
-
-    message.className = "error";
-    message.textContent =
-      "Introduce un teléfono válido.";
-
-    return;
-  }
-
-  try {
-
-    const reserved =
-      selectedNumber;
-
-    await api(
-      "/rest/v1/rpc/reserve_raffle_number",
-      {
-        method:"POST",
-        body:JSON.stringify({
-          p_number: reserved,
-          p_name: name,
-          p_phone: phone,
-          p_email:
-            email || null
-        })
-      }
-    );
-
-    message.className = "ok";
-
-    message.textContent =
-      "Reserva registrada correctamente. " +
-      "El administrador debe confirmar la compra.";
-
-    const whatsapp =
-      DATA.settings
-      ?.whatsapp_phone;
-
-    if (whatsapp) {
-
-      const text =
-        encodeURIComponent(
-          "Hola, he reservado el número " +
-          formatNumber(reserved) +
-          " para el sorteo. Nombre: " +
-          name
-        );
-
-      el("whatsapp").href =
-        "https://wa.me/" +
-        String(whatsapp)
-        .replace(/\D/g,"") +
-        "?text=" +
-        text;
-
-      el("whatsapp")
-        .classList.remove("hidden");
-
+async function createAccount(){
+  const email=$("adminEmail").value.trim(),pass=$("adminPass").value;
+  if(email.toLowerCase()!==PRIMARY_EMAIL)return msg("loginMsg","Para crear el acceso principal debes usar "+PRIMARY_EMAIL,"err");
+  if(pass.length<6)return msg("loginMsg","Elige una contraseña de al menos 6 caracteres.","err");
+  try{
+    const out=await signAuth("/auth/v1/signup",email,pass);
+    if(out.access_token){token=out.access_token;currentUser=out.user;localStorage.setItem("raffle_token",token);msg("loginMsg","Acceso principal creado correctamente.");await loadAdmin()}
+    else msg("loginMsg","Cuenta creada. Revisa tu correo para confirmar la dirección y después pulsa Entrar.");
+  }catch(e){msg("loginMsg",e.message,"err")}
+}
+async function registerPending(){
+  const email=$("adminEmail").value.trim(),pass=$("adminPass").value;
+  if(!email||pass.length<6)return msg("loginMsg","Escribe el correo y una contraseña de al menos 6 caracteres.","err");
+  try{await signAuth("/auth/v1/signup",email,pass);msg("loginMsg","Cuenta registrada. El administrador principal debe autorizar este correo antes de poder entrar.")}catch(e){msg("loginMsg",e.message,"err")}
+}
+function logout(show=true){token="";currentUser=null;localStorage.removeItem("raffle_token");$("loginBox").classList.remove("hidden");$("adminPanel").classList.add("hidden");if(show)msg("loginMsg","Sesión cerrada.")}
+async function loadAdmin(){
+  try{
+    const [settings,orders,prizes,me]=await Promise.all([
+      api("/rest/v1/raffle_settings?select=*&limit=1",{auth:true}),
+      api("/rest/v1/raffle_orders?select=*&order=created_at.desc",{auth:true}),
+      api("/rest/v1/raffle_prizes?select=*&order=position",{auth:true}),
+      api("/auth/v1/user",{auth:true})
+    ]);
+    currentUser=me;$("loginBox").classList.add("hidden");$("adminPanel").classList.remove("hidden");
+    const mine=await api("/rest/v1/raffle_admins?select=active,is_owner&user_id=eq."+me.id,{auth:true});
+    const isOwner=!!mine[0]?.is_owner;
+    $("adminIdentity").textContent=isOwner?"Administrador principal · "+(me.email||PRIMARY_EMAIL):"Administrador · "+(me.email||"");
+    $("ownerOnly").classList.toggle("hidden",!isOwner);
+    const s=settings[0]||{};$("setWa").value=s.whatsapp_phone||"";$("setPrice").value=s.number_price||"";$("setRef").value=s.draw_reference||"";
+    $("orders").innerHTML=orders.length?orders.map(o=>{
+      let act="";
+      if(o.status==="reserved")act='<button class="mini" onclick="orderAction(\''+o.id+'\',\'confirmed\')">Confirmar</button> <button class="mini" onclick="orderAction(\''+o.id+'\',\'cancelled\')">Liberar</button>';
+      return "<tr><td>"+fmt(o.number)+"</td><td>"+clean(o.participant_name)+"</td><td>"+clean(o.participant_phone)+"</td><td>"+clean(o.status)+"</td><td>"+act+"</td></tr>";
+    }).join(""):'<tr><td colspan="5">Todavía no hay reservas.</td></tr>';
+    $("adminPrizes").innerHTML=prizes.map(p=>'<div class="prizeCard"><div class="prizeBody"><b>'+p.position+'.º premio</b>'+
+      '<label style="margin-top:10px">Activo <input id="pe'+p.position+'" type="checkbox" style="width:auto" '+(p.enabled?'checked':'')+'></label>'+
+      '<label>Título<input id="pt'+p.position+'" value="'+clean(p.title)+'"></label>'+
+      '<label>Descripción<textarea id="pd'+p.position+'">'+clean(p.description||"")+'</textarea></label>'+
+      '<label>URL imagen 1<input id="pi'+p.position+'" value="'+clean(p.image_url||"")+'" placeholder="https://..."></label>'+
+      '<label>URL imagen 2<input id="pi2'+p.position+'" value="'+clean(p.image_url_2||"")+'" placeholder="https://..."></label>'+
+    '</div></div>').join("");
+    if(isOwner)await loadAdmins();
+  }catch(e){logout(false);msg("loginMsg","La sesión ha caducado o no tienes permiso: "+e.message,"err")}
+}
+async function saveSettings(){
+  try{
+    const s=DATA?.settings;if(!s?.id)throw new Error("No se encontró la configuración");
+    await api("/rest/v1/raffle_settings?id=eq."+s.id,{method:"PATCH",auth:true,headers:{Prefer:"return=minimal"},body:JSON.stringify({whatsapp_phone:$("setWa").value.trim()||null,number_price:$("setPrice").value?Number($("setPrice").value):null,draw_reference:$("setRef").value.trim()})});
+    msg("settingsMsg","Configuración guardada.");await loadPublic();
+  }catch(e){msg("settingsMsg",e.message,"err")}
+}
+async function orderAction(id,status){
+  try{await api("/rest/v1/rpc/admin_set_raffle_order_status",{method:"POST",auth:true,body:JSON.stringify({p_order_id:id,p_status:status})});await loadPublic();await loadAdmin()}catch(e){alert(e.message)}
+}
+async function savePrizes(){
+  try{
+    for(const p of DATA.prizes){
+      await api("/rest/v1/raffle_prizes?position=eq."+p.position,{method:"PATCH",auth:true,headers:{Prefer:"return=minimal"},body:JSON.stringify({
+        enabled:$("pe"+p.position).checked,title:$("pt"+p.position).value.trim()||("Premio "+p.position),
+        description:$("pd"+p.position).value.trim()||null,image_url:$("pi"+p.position).value.trim()||null,image_url_2:$("pi2"+p.position).value.trim()||null
+      })})
     }
-
-    selectedNumber = null;
-
-    await loadPublicData();
-
-  }
-  catch (error) {
-
-    message.className = "error";
-    message.textContent =
-      error.message;
-
-    await loadPublicData();
-
-  }
-
+    msg("prizeMsg","Premios guardados.");await loadPublic();await loadAdmin();
+  }catch(e){msg("prizeMsg",e.message,"err")}
+}
+async function publishWinners(){
+  try{
+    const nums=[$("win1").value,$("win2").value,$("win3").value];
+    for(let i=0;i<3;i++)if(nums[i]!=="")await api("/rest/v1/rpc/publish_raffle_winner",{method:"POST",auth:true,body:JSON.stringify({p_position:i+1,p_winning_number:Number(nums[i])})});
+    alert("Ganadores publicados.");await loadPublic();
+  }catch(e){alert(e.message)}
+}
+async function loadAdmins(){
+  try{
+    const list=await api("/rest/v1/rpc/owner_list_raffle_admins",{method:"POST",auth:true,body:"{}"});
+    $("adminsList").innerHTML=list.map(a=>'<tr><td>'+clean(a.email)+'</td><td>'+(a.is_owner?'<span class="ownerTag">Principal</span>':'Administrador')+'</td><td>'+(a.active?'Activo':'Sin permiso')+'</td><td>'+(a.is_owner?'—':'<button class="mini" onclick="toggleAdmin(\''+clean(a.email)+'\','+(!a.active)+')">'+(a.active?'Quitar permiso':'Activar')+'</button>')+'</td></tr>').join("");
+  }catch(e){msg("adminsMsg",e.message,"err")}
+}
+async function setAdminByEmail(active){
+  const email=$("newAdminEmail").value.trim();if(!email)return msg("adminsMsg","Escribe un correo.","err");
+  try{await api("/rest/v1/rpc/owner_set_raffle_admin",{method:"POST",auth:true,body:JSON.stringify({p_email:email,p_active:active})});msg("adminsMsg","Permiso actualizado.");$("newAdminEmail").value="";await loadAdmins()}catch(e){msg("adminsMsg",e.message,"err")}
+}
+async function toggleAdmin(email,active){
+  try{await api("/rest/v1/rpc/owner_set_raffle_admin",{method:"POST",auth:true,body:JSON.stringify({p_email:email,p_active:active})});await loadAdmins()}catch(e){msg("adminsMsg",e.message,"err")}
 }
 
-function showAdmin() {
-
-  el("admin")
-    .classList.remove("hidden");
-
-  el("admin")
-    .scrollIntoView({
-      behavior:"smooth"
-    });
-
-  if (adminToken) {
-
-    loadAdmin()
-      .catch(() => {});
-
-  }
-
-}
-
-async function login() {
-
-  const loginMessage =
-    el("loginMsg");
-
-  loginMessage.textContent = "";
-  loginMessage.className = "";
-
-  try {
-
-    const response =
-      await fetch(
-        SUPABASE_URL +
-        "/auth/v1/token?grant_type=password",
-        {
-          method:"POST",
-          headers:headers(false),
-          body:JSON.stringify({
-            email:
-              el("adminEmail").value.trim(),
-            password:
-              el("adminPass").value
-          })
-        }
-      );
-
-    const result =
-      await response.json();
-
-    if (!response.ok) {
-
-      throw new Error(
-        result.error_description ||
-        result.msg ||
-        "Email o contraseña incorrectos"
-      );
-
-    }
-
-    adminToken =
-      result.access_token;
-
-    const admin =
-      await api(
-        "/rest/v1/raffle_admins" +
-        "?select=active" +
-        "&user_id=eq." +
-        result.user.id,
-        {
-          auth:true
-        }
-      );
-
-    if (
-      !admin.length ||
-      !admin[0].active
-    ) {
-
-      adminToken = "";
-
-      localStorage.removeItem(
-        "raffle_token"
-      );
-
-      throw new Error(
-        "Este usuario no tiene permisos de administrador."
-      );
-
-    }
-
-    localStorage.setItem(
-      "raffle_token",
-      adminToken
-    );
-
-    loginMessage.className = "ok";
-    loginMessage.textContent =
-      "Acceso correcto.";
-
-    await loadAdmin();
-
-  }
-  catch (error) {
-
-    loginMessage.className = "error";
-    loginMessage.textContent =
-      error.message;
-
-  }
-
-}
-
-async function loadAdmin() {
-
-  const [
-    settings,
-    orders,
-    prizes
-  ] =
-  await Promise.all([
-
-    api(
-      "/rest/v1/raffle_settings?select=*&limit=1",
-      {auth:true}
-    ),
-
-    api(
-      "/rest/v1/raffle_orders?select=*&order=created_at.desc",
-      {auth:true}
-    ),
-
-    api(
-      "/rest/v1/raffle_prizes?select=*&order=position",
-      {auth:true}
-    )
-
-  ]);
-
-  el("loginBox")
-    .classList.add("hidden");
-
-  el("adminBox")
-    .classList.remove("hidden");
-
-  const settingsData =
-    settings[0];
-
-  el("setWa").value =
-    settingsData
-    .whatsapp_phone || "";
-
-  el("setPrice").value =
-    settingsData
-    .number_price || "";
-
-  el("setRef").value =
-    settingsData
-    .draw_reference || "";
-
-  el("orders").innerHTML =
-    orders.length
-    ? orders.map(order => {
-
-        let actions = "";
-
-        if (order.status === "reserved") {
-
-          actions = `
-            <button
-              onclick="orderAction(
-                '${order.id}',
-                'confirmed'
-              )"
-            >
-              Confirmar
-            </button>
-
-            <button
-              class="danger"
-              onclick="orderAction(
-                '${order.id}',
-                'cancelled'
-              )"
-            >
-              Liberar
-            </button>
-          `;
-
-        }
-
-        return `
-          <tr>
-
-            <td>
-              ${formatNumber(order.number)}
-            </td>
-
-            <td>
-              ${escapeHtml(order.participant_name)}
-            </td>
-
-            <td>
-              ${escapeHtml(order.participant_phone)}
-            </td>
-
-            <td>
-              ${escapeHtml(order.status)}
-            </td>
-
-            <td>
-              ${actions}
-            </td>
-
-          </tr>
-        `;
-
-      }).join("")
-    : `
-      <tr>
-        <td colspan="5">
-          Todavía no hay reservas.
-        </td>
-      </tr>
-    `;
-
-  el("adminPrizes").innerHTML =
-    prizes.map(prize => `
-
-      <div class="card">
-
-        <b>
-          ${prize.position}º premio
-        </b>
-
-        <label
-          style="
-            display:flex;
-            gap:8px;
-            align-items:center
-          "
-        >
-
-          Activo
-
-          <input
-            id="pe${prize.position}"
-            type="checkbox"
-            style="width:auto"
-            ${prize.enabled ? "checked" : ""}
-          >
-
-        </label>
-
-        <label>
-
-          Nombre del premio
-
-          <input
-            id="pt${prize.position}"
-            value="${escapeHtml(prize.title)}"
-          >
-
-        </label>
-
-        <label>
-
-          Descripción
-
-          <textarea
-            id="pd${prize.position}"
-          >${escapeHtml(prize.description || "")}</textarea>
-
-        </label>
-
-        <label>
-
-          Foto del premio
-
-          <input
-            id="pf${prize.position}"
-            type="file"
-            accept="image/*"
-          >
-
-        </label>
-
-        <input
-          id="pi${prize.position}"
-          type="hidden"
-          value="${escapeHtml(prize.image_url || "")}"
-        >
-
-        ${
-          prize.image_url
-          ? `
-            <img
-              class="prizeimg"
-              src="${escapeHtml(prize.image_url)}"
-              alt="Premio"
-            >
-          `
-          : ""
-        }
-
-      </div>
-
-    `).join("");
-
-}
-
-async function saveSettings() {
-
-  try {
-
-    const id =
-      DATA.settings.id;
-
-    await api(
-      "/rest/v1/raffle_settings?id=eq." +
-      id,
-      {
-        method:"PATCH",
-        auth:true,
-        body:JSON.stringify({
-
-          whatsapp_phone:
-            el("setWa").value.trim()
-            || null,
-
-          number_price:
-            el("setPrice").value === ""
-            ? null
-            : Number(
-                el("setPrice").value
-              ),
-
-          draw_reference:
-            el("setRef").value.trim()
-            || null,
-
-          updated_at:
-            new Date().toISOString()
-
-        })
-      }
-    );
-
-    alert(
-      "Configuración guardada."
-    );
-
-    await loadPublicData();
-    await loadAdmin();
-
-  }
-  catch (error) {
-
-    alert(error.message);
-
-  }
-
-}
-
-async function orderAction(
-  orderId,
-  status
-) {
-
-  try {
-
-    await api(
-      "/rest/v1/rpc/set_raffle_order_status",
-      {
-        method:"POST",
-        auth:true,
-        body:JSON.stringify({
-          p_order:orderId,
-          p_status:status
-        })
-      }
-    );
-
-    await loadPublicData();
-    await loadAdmin();
-
-  }
-  catch (error) {
-
-    alert(error.message);
-
-  }
-
-}
-
-async function uploadPrizeImage(
-  position
-) {
-
-  const input =
-    el("pf" + position);
-
-  const previous =
-    el("pi" + position)
-    .value;
-
-  if (
-    !input.files ||
-    !input.files[0]
-  ) {
-
-    return previous || null;
-
-  }
-
-  const file =
-    input.files[0];
-
-  const safeName =
-    file.name.replace(
-      /[^a-zA-Z0-9._-]/g,
-      "_"
-    );
-
-  const path =
-    "premio-" +
-    position +
-    "-" +
-    Date.now() +
-    "-" +
-    safeName;
-
-  const response =
-    await fetch(
-      SUPABASE_URL +
-      "/storage/v1/object/" +
-      "raffle-prizes/" +
-      path,
-      {
-        method:"POST",
-        headers:{
-          "apikey":
-            SUPABASE_KEY,
-
-          "Authorization":
-            "Bearer " +
-            adminToken,
-
-          "Content-Type":
-            file.type ||
-            "application/octet-stream"
-        },
-        body:file
-      }
-    );
-
-  if (!response.ok) {
-
-    throw new Error(
-      "No se pudo subir la imagen."
-    );
-
-  }
-
-  return (
-    SUPABASE_URL +
-    "/storage/v1/object/public/" +
-    "raffle-prizes/" +
-    path
-  );
-
-}
-
-async function savePrizes() {
-
-  try {
-
-    for (
-      let position = 1;
-      position <= 3;
-      position++
-    ) {
-
-      const imageUrl =
-        await uploadPrizeImage(
-          position
-        );
-
-      await api(
-        "/rest/v1/raffle_prizes" +
-        "?position=eq." +
-        position,
-        {
-          method:"PATCH",
-          auth:true,
-          body:JSON.stringify({
-
-            enabled:
-              el(
-                "pe" + position
-              ).checked,
-
-            title:
-              el(
-                "pt" + position
-              ).value.trim()
-              ||
-              (
-                "Premio " +
-                position
-              ),
-
-            description:
-              el(
-                "pd" + position
-              ).value.trim()
-              || null,
-
-            image_url:
-              imageUrl,
-
-            updated_at:
-              new Date()
-              .toISOString()
-
-          })
-        }
-      );
-
-    }
-
-    alert(
-      "Premios guardados."
-    );
-
-    await loadPublicData();
-    await loadAdmin();
-
-  }
-  catch (error) {
-
-    alert(error.message);
-
-  }
-
-}
-
-async function publishWinners() {
-
-  try {
-
-    const values = [
-      el("win1").value,
-      el("win2").value,
-      el("win3").value
-    ];
-
-    const winners =
-      values
-      .map(
-        (value,index) => {
-
-          if (value === "") {
-            return null;
-          }
-
-          return {
-
-            position:
-              index + 1,
-
-            winning_number:
-              Number(value),
-
-            published:
-              true,
-
-            published_at:
-              new Date()
-              .toISOString()
-
-          };
-
-        }
-      )
-      .filter(Boolean);
-
-    if (!winners.length) {
-
-      throw new Error(
-        "Introduce al menos el primer número ganador."
-      );
-
-    }
-
-    for (
-      const winner
-      of winners
-    ) {
-
-      if (
-        winner.winning_number < 0 ||
-        winner.winning_number > 99
-      ) {
-
-        throw new Error(
-          "El número ganador debe estar entre 00 y 99."
-        );
-
-      }
-
-    }
-
-    await api(
-      "/rest/v1/raffle_winners?position=gte.1",
-      {
-        method:"DELETE",
-        auth:true
-      }
-    );
-
-    await api(
-      "/rest/v1/raffle_winners",
-      {
-        method:"POST",
-        auth:true,
-        headers:{
-          "Prefer":
-            "return=minimal"
-        },
-        body:
-          JSON.stringify(
-            winners
-          )
-      }
-    );
-
-    alert(
-      "Ganadores publicados."
-    );
-
-    await loadPublicData();
-
-  }
-  catch (error) {
-
-    alert(error.message);
-
-  }
-
-}
-
-loadPublicData();
-
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;$("installBtn").style.display="block"});
+async function installApp(){if(!deferredPrompt){alert("En Android: abre el menú del navegador y pulsa “Instalar aplicación” o “Añadir a pantalla de inicio”.");return}deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;$("installBtn").style.display="none"}
+if("serviceWorker" in navigator)navigator.serviceWorker.register("./sw.js").catch(()=>{});
+loadPublic();
 </script>
-
 </body>
 </html>
