@@ -1,9 +1,15 @@
-name: Publicar web Sorteo Oviedo
+name: Publicar webs en GitHub Pages
 
 on:
   push:
     branches: ["main"]
     paths:
+      - "App.tsx"
+      - "app.json"
+      - "package.json"
+      - "src/**"
+      - "assets/**"
+      - "public/**"
       - "docs/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
@@ -18,6 +24,31 @@ jobs:
       - name: Descargar código
         uses: actions/checkout@v4
 
+      - name: Preparar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Preparar iconos PWA
+        run: |
+          mkdir -p public
+          cp assets/limpiezas-isoana.png public/logo192.png
+          cp assets/limpiezas-isoana.png public/logo512.png
+
+      - name: Compilar Limpiezas Isoana para web
+        run: npm run build:web
+
+      - name: Integrar PWA en docs/isoana
+        run: |
+          rm -rf docs/isoana
+          mkdir -p docs/isoana
+          cp -R dist/. docs/isoana/
+          touch docs/.nojekyll
+
       - name: Publicar docs en gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:
@@ -25,3 +56,4 @@ jobs:
           publish_dir: ./docs
           publish_branch: gh-pages
           force_orphan: true
+          enable_jekyll: false
