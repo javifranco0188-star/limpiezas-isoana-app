@@ -48,6 +48,15 @@ jobs:
           mkdir -p docs/isoana
           cp -R dist/. docs/isoana/
           cp -R web/isoana/. docs/isoana/
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('docs/isoana/index.html')
+          s = p.read_text()
+          tag = '<script type="module" src="./admin-images.js?v=20260905-2"></script>'
+          if 'admin-images.js' not in s:
+              s = s.replace('</body>', tag + '</body>')
+          p.write_text(s)
+          PY
           mkdir -p docs/assets
           cp assets/limpiezas-isoana.png docs/assets/limpiezas-isoana.png
           touch docs/.nojekyll
