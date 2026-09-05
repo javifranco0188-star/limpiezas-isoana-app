@@ -268,7 +268,7 @@ export default function App() {
     if (!serviceId || !name || !phone || !address || !date) return Alert.alert("Faltan datos","Completa servicio, nombre, teléfono, dirección y fecha.");
     const parsed = new Date(date);
     if (isNaN(parsed.getTime())) return Alert.alert("Fecha no válida","Usa un formato como 2026-09-05T10:00");
-    const {error} = await supabase.from("bookings").insert({
+    const {data:created,error} = await supabase.from("bookings").insert({
       client_id:session.user.id,
       service_id:serviceId,
       maintenance_plan_id:planId,
@@ -280,8 +280,12 @@ export default function App() {
       status:"received",
       payment_status:"pending",
       reservation_amount:20
-    });
+    }).select("id").single();
     if (error) return Alert.alert("No se pudo reservar",error.message);
+    if (created?.id) {
+      const { error: notifyError } = await supabase.functions.invoke("notify-new-booking", { body: { booking_id: created.id } });
+      if (notifyError) console.warn("No se pudo enviar la notificación de reserva", notifyError.message);
+    }
     Alert.alert("Reserva creada","Tu reserva ya está guardada.");
     setTab("reserva");
     loadBookings();
