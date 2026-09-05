@@ -1,0 +1,26 @@
+{
+  "name": "Limpiezas Isoana",
+  "short_name": "Isoana",
+  "description": "Limpieza profesional en Valencia y alrededores",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#0B2E59",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "logo192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "logo512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
