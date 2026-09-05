@@ -11,6 +11,7 @@ on:
       - "assets/**"
       - "public/**"
       - "docs/**"
+      - "web/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -46,6 +47,9 @@ jobs:
           rm -rf docs/isoana
           mkdir -p docs/isoana
           cp -R dist/. docs/isoana/
+          cp -R web/isoana/. docs/isoana/
+          mkdir -p docs/assets
+          cp assets/limpiezas-isoana.png docs/assets/limpiezas-isoana.png
           touch docs/.nojekyll
 
       - name: Publicar docs en gh-pages
