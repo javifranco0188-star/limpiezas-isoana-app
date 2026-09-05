@@ -4,26 +4,29 @@ import * as Device from "expo-device";
 import Constants from "expo-constants";
 import { supabase } from "./supabase";
 
-// Cómo se muestran las notificaciones mientras la app está abierta
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-    shouldShowBanner: true,
-    shouldShowList: true
-  })
-});
+// Las notificaciones push de Expo son para la app nativa.
+// En web/PWA evitamos inicializarlas para no provocar errores en el navegador.
+if (Platform.OS !== "web") {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+      shouldShowBanner: true,
+      shouldShowList: true
+    })
+  });
+}
 
 /**
  * Pide permiso de notificaciones, obtiene el push token de Expo y lo
- * guarda en profiles.push_token para ese usuario. Solo tiene sentido
- * llamarlo para cuentas de personal/admin, que son quienes deben
- * enterarse de las nuevas reservas.
+ * guarda en profiles.push_token para ese usuario. Solo se usa en la app
+ * nativa para cuentas de personal/admin.
  */
 export async function registerForPushNotifications(userId: string) {
+  if (Platform.OS === "web") return null;
+
   if (!Device.isDevice) {
-    // Los simuladores/emuladores no reciben push notifications.
     return null;
   }
 
