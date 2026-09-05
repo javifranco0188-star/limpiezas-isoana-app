@@ -6,13 +6,17 @@
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "build:web": "expo export --platform web"
   },
   "dependencies": {
     "expo": "~53.0.0",
     "expo-status-bar": "~2.2.3",
     "react": "19.0.0",
+    "react-dom": "19.0.0",
     "react-native": "0.79.5",
+    "react-native-web": "~0.20.0",
+    "@expo/metro-runtime": "~5.0.4",
     "@supabase/supabase-js": "2.56.0",
     "@react-native-async-storage/async-storage": "^2.1.2",
     "react-native-url-polyfill": "^2.0.0",
