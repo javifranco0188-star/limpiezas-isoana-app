@@ -19,6 +19,19 @@
         "backgroundColor": "#0B2E59"
       }
     },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/limpiezas-isoana.png",
+      "name": "Limpiezas Isoana",
+      "shortName": "Isoana",
+      "lang": "es",
+      "themeColor": "#0B2E59",
+      "backgroundColor": "#ffffff"
+    },
+    "experiments": {
+      "baseUrl": "/limpiezas-isoana-app/isoana"
+    },
     "userInterfaceStyle": "light",
     "extra": {
       "eas": {
